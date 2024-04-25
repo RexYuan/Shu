@@ -35,13 +35,17 @@ AI system, however, may be biased. Factors such as inherent biases in original d
 
 Correctional Offender Management Profiling for Alternative Sanctions (COMPAS) is a tool for predicting recidivism---the tendency of criminals to reoffend. It is used in the criminal justice system in multiple states in the United States. In 2016, it was discovered in an investigation by the journalists at ProPublica that the COMPAS system is, in fact, unfair towards minority and disadvantaged groups.
 
+Cases such as COMPAS underscore the critical importance of rigorously examining the fairness of AI systems by third parties. Fairness is fundementally a subjective social construct, heavily influenced by cultural context and deeply rooted in historical inequalities.
 
-\section{Ease of Use}
-fairness is subjective, based on culture and often not quantitative
-for AI system we use quantitative fairness measures
-transparency and objectivity example : COMPAS
-third party needed for auditing example : propublica like entity can use our stuff; we're not replacing but supplement; domain knowledge
-we propose a framework
+We leverage quantitative measures that provide transparent and objective insights. By employing mathematically rigorous methodologies, our research can offer a more deeper look into the fairness of AI systems, enabling third parties to make more informed and robust judgment. For example, it would reveal that the COMPAS system violates a fairness measure called equalized odds.
+
+In addition to equalized odds, there are a number of fairness measures for AI systems. Our framework aims to help third parties understand these metrics and navigate complex datasets with ease, pinpointing instances of bias and discrimination.
+
+With our tool, a third party such as ProPublica could clearly and easily demonstrates that COMPAS violates equalized odds according to their datasets. Our platform empowers organizations to conduct thorough assessments of AI fairness and uncover discrepancies in predictive models.
+
+This functionality not only facilitates sound judgment but also fosters objectivity and transparency regarding AI systems, ultimately bolster the claim of fairness and justice in AI-enabled decision-making.
+
+Our tool is written in Python and is offered as a Python package. It supports common datasets format such as csv. It is open-sourced and publicly available for downloads.
 
 \end{document}
 
