@@ -1,6 +1,20 @@
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{CJKutf8}
+\usepackage{datetime}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{ulem}
+\usepackage{hyperref}
+\usepackage{graphicx}
+
 \begin{document}
 
 \title{Ensuring Fairness with Transparent Auditing of Quantitative Bias in AI Systems\\
@@ -19,6 +33,14 @@ email address or ORCID}
 City, Country \\
 email address or ORCID}
 }
+
+\DeclarePairedDelimiter{\set}{\{}{\}}
+\DeclarePairedDelimiter{\tuple}{(}{)}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+
+\renewcommand{\implies}{\rightarrow}
+
+\newcommand{\bye}[1]{}
 
 % \author{\IEEEauthorblockN{1\textsuperscript{st} Chih-Cheng Rex Yuan}
 % \IEEEauthorblockA{\textit{Institute of Information Science} \\
@@ -63,6 +85,60 @@ With our tool, a third party such as ProPublica could clearly and easily demonst
 This functionality not only facilitates sound judgment but also fosters objectivity and transparency regarding AI systems, ultimately bolster the claim of fairness and justice in AI-enabled decision-making.
 
 Our tool is written in Python and is offered as a Python package. It supports common datasets format such as csv. It is open-sourced and publicly available for downloads.
+
+\begin{table}[h]
+    \centering
+    % \resizebox{\textwidth}{!}{
+    \resizebox{\columnwidth}{!}{
+    \begin{tabular}{|l|c|} % 'l' specifies left alignment for the first column
+        \hline
+        \textbf{Column 1} & \textbf{Column 2} \\
+        \hline
+disparate impact & $\frac{P[\hat{Y} = 1 | S \neq 1]}{P[\hat{Y} = 1 | S = 1]} \geq 1 - \epsilon$ \\
+\hline
+demographic parity & $\abs{P[\hat{Y} = 1 | S = 1] - P[\hat{Y} = 1 | S \neq 1]} \leq \epsilon$ \\
+\hline
+equalized odds: false positive & $\abs{P[\hat{Y} = 1 | S = 1, Y = 0] - P[\hat{Y} = 1 | S \neq 1, Y = 0]} \leq \epsilon$ \\
+\hline
+equalized odds: true positive & $\abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} \leq \epsilon$ \\
+\hline
+equal opportunity & $\abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} \leq \epsilon$ \\
+\hline
+accuracy eqaulity & $\abs{P[Y = \hat{Y} | S = 1] - P[Y = \hat{Y} | S \neq 1]} \leq \epsilon$ \\
+\hline
+predictive parity & $\abs{P[Y = 1 | S = 1, \hat{Y} = 1] - P[Y = 1 | S \neq 1, \hat{Y} = 1]} \leq \epsilon$ \\
+\hline
+equal calibration & $\abs{P[Y = 1 | S = 1, \hat{V} = v] - P[Y = 1 | S \neq 1, \hat{V} = v]} \leq \epsilon$ \\
+\hline
+conditional statistical parity & $\abs{P[\hat{Y} = 1 | S = 1, L = l] - P[\hat{Y} = 1 | S \neq 1, L = l]} \leq \epsilon$ \\
+\hline
+predictive equality & $\abs{P[\hat{Y} = 1 | S = 1, Y = 0] - P[\hat{Y} = 1 | S \neq 1, Y = 0]} \leq \epsilon$ \\
+\hline
+conditional use accuracy equaliyt: true positive & $\abs{P[Y = 1 | S = 1, \hat{Y} = 1] - P[Y = 1 | S \neq 1, \hat{Y} = 1]} \leq \epsilon$ \\
+\hline
+conditional use accuracy equality: true negative & $\abs{P[Y = 0 | S = 1, \hat{Y} = 0] - P[Y = 0 | S \neq 1, \hat{Y} = 0]} \leq \epsilon$ \\
+\hline
+mean difference & $\abs{E[\hat{Y}|S = 1] - E[\hat{Y}|S \neq 1]} \leq \epsilon$ \\
+        \hline
+    \end{tabular}
+    }
+    \caption{Example Table}
+    \label{tab:example}
+\end{table}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \end{document}
 

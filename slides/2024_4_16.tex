@@ -1,0 +1,397 @@
+\documentclass{beamer}
+
+\usetheme{CambridgeUS}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{CJKutf8}
+\usepackage{datetime}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{ulem}
+\usepackage{hyperref}
+
+\usetikzlibrary{positioning, quotes}
+
+\newdate{date}{16}{04}{2024}
+\date{\displaydate{date}}
+\title[Fairness]{Fairness in Machine Learning}
+\author[Rex]{
+    \begin{CJK}{UTF8}{bsmi}袁至誠\end{CJK}\newline
+    Chih-cheng Rex Yuan\newline
+    \href{https://rexyuan.com/}{rexyuan.com}
+    }
+\institute[IIS]{Institute of Information Science}
+
+\usetikzlibrary{arrows,shapes,fit}
+\pgfdeclarelayer{background}
+\pgfsetlayers{background,main}
+
+\DeclarePairedDelimiter{\set}{\{}{\}}
+\DeclarePairedDelimiter{\tuple}{(}{)}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+
+\let\oldleq\leq
+\renewcommand{\leq}[1][]{\oldleq_{#1}}
+\renewcommand{\implies}{\rightarrow}
+
+\newcommand{\bye}[1]{}
+
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\sred}[1]{\textcolor{red}{\sout{#1}}}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+    \frametitle{Bias}
+    \begin{itemize}
+        \item Decision making by machine learning may be biased.
+        \item Bias can come from several sources:
+        \begin{itemize}
+            \item Biased data. ML is deisgned to replicate this.
+            \item Missing data. The datasets might not be representative.
+            \item Biased algorithms. The objective functions might introduce bias.
+            \item Sensitive attributes: Age, Gender, ..., etc..
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Protected Attributes}
+    What are the protected(sensitive) attributes?
+    \begin{table}
+        \begin{tabular}{|c|c|c|c|c|}
+            \hline
+            \red{Age} & \red{Gender} & Occupation & \red{Income} & Education \\
+            \hline
+            \red{28} & \red{M} & Engineering & \red{\$80,000} & Master \\
+            \red{28} & \red{F} & Engineering & \red{\$65,000} & Master \\
+            \red{45} & \red{M} & Medicine    & \red{\$100,000} & Doctorate \\
+            \red{40} & \red{F} & Legal       & \red{\$150,000} & Law Degree \\
+            \red{32} & \red{M} & Education   & \red{\$55,000} & Bachelor \\
+            \hline
+        \end{tabular}
+        \caption{Example Dataset}
+    \end{table}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Fairness Through Unawareness}
+    The most straightforward solution to fairness seems to be that
+    just simply dropping all the protected columns.
+    \begin{itemize}
+        \item This is called fairness through unawareness.
+        \item Formally it's
+        \[
+            X_i = X_j \implies \hat{Y}_i = \hat{Y}_j
+        \]
+        where $i,j$ are individuals; $X$ is the set of attributes
+        except protected attributes; and $\hat{Y}$ is the prediction.
+        \item Also known as fairness through blindness and
+        anti-classification.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Fairness Through Unawareness}
+    The downside of this is there could still be ``proxy'' attributes
+    that correlate with protected attributes: like Occupation still
+    correlates with Income.
+    \begin{table}
+        \begin{tabular}{|c|c|c|c|c|}
+            \hline
+            \sout{Age} & \sout{Gender}   & \red{Occupation}  & \red{\sout{Income}}   & Education \\
+            \hline
+            \sout{28} & \sout{M} & \red{Engineering} & \red{\sout{\$80,000}} & Master \\
+            \sout{28} & \sout{F} & \red{Engineering} & \red{\sout{\$65,000}} & Master \\
+            \sout{45} & \sout{M} & \red{Medicine}    & \red{\sout{\$100,000}} & Doctorate \\
+            \sout{40} & \sout{F} & \red{Legal}       & \red{\sout{\$150,000}} & Law Degree \\
+            \sout{32} & \sout{M} & \red{Education}   & \red{\sout{\$55,000}} & Bachelor \\
+            \hline
+        \end{tabular}
+        \caption{Example Dataset}
+    \end{table}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Disparate Impact}
+    \begin{itemize}
+        \item In 1971, the US spreme court ruled it is illegal for hiring decisions to
+        have ``disparate impact'' by race. It is taken as unintentional
+        discrimination (as opposed to ``disparate treatment'', intentional discrimination).
+        \item Legal issues involving disparate impact usually refer to the ``80\% Rule'',
+        advocated by the US Equal Employment Opportunity Commission, where the
+        selection rate of a minority group is to be no less than 80\% of that of
+        a majority group.
+        \item Formally, it requires that
+        \[
+            \frac{P[\hat{Y} = 1 | S \neq 1]}{P[\hat{Y} = 1 | S = 1]} \geq 1 - \epsilon
+        \]
+        where $\hat{Y} = 1$ represents predicated/observed result being
+        acceptance(positive);
+        $S = 1$ represents privileged group;
+        $S \neq 1$ represents unprivileged group where $S$ is some protected
+        attributes.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Disparate Impact}
+    For example, if for some job opening there are $10$ female applicants and
+    $100$ male applicants, and there are $2$ accepted females
+    and $90$ accepted males. The measure does not hold for $\epsilon = 0.2$ because
+    \[
+        \frac{2/10}{80/100} = 0.25 \not\geq 0.8
+    \]
+    while if there were $9$ accepted females then it does hold because
+    \[
+        \frac{9/10}{80/100} = 1.125 \geq 0.8
+    \]
+\end{frame}
+
+\begin{frame}
+    \frametitle{Demographic Parity}
+    \begin{itemize}
+        \item Demographic parity is similar to disparate impact but, instead of
+        ratio, difference is taken.
+        \item Formally, it requires that
+        \[
+            \abs{P[\hat{Y} = 1 | S = 1] - P[\hat{Y} = 1 | S \neq 1]} \leq \epsilon
+        \]
+        where $\hat{Y} = 1$ represents acceptance(positive);
+        $S = 1$ represents privileged group;
+        $S \neq 1$ represents unprivileged group where $S$ is some protected
+        attributes.
+        \item This is usually known as affirmative action.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Disparate Impact and Demographic Parity}
+    If for some job opening there are $10$ female applicants and
+    $100$ male applicants, and there are $8$ accepted females
+    and $80$ accepted males:
+    \[
+        \frac{8/10}{90/100} = 0.\overline{8} \quad\quad\quad
+        \abs{8/10 - 90/100} = 0.1
+    \]
+    while if there were $1$ accepted females and $20$ accepted males:
+    \[
+        \frac{1/10}{20/100} = 0.5 \quad\quad\quad
+        \abs{1/10 - 20/100} = 0.1
+    \]
+\end{frame}
+
+\begin{frame}
+    \frametitle{Disparate Impact and Demographic Parity}
+    When privileged group usually has the higher positive rate ($r_b \geq r_a$),
+    disparate impact is strictly stronger than demographic parity:
+    \begin{align*}
+        \frac{r_a}{r_b} & \geq 1 - \epsilon \\
+        r_a & \geq r_b - r_b \epsilon \\
+        r_b \epsilon & \geq r_b - r_a \\
+        \epsilon & \geq r_b - r_a \text{ since } 0 \leq r_b \leq 1
+    \end{align*}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Disparate Impact and Demographic Parity}
+    Disadvantage of these two measures:
+    \begin{itemize}
+        \item ``A fully accurate classifier
+        may be considered unfair, when the base rates (i.e., the proportion of
+        actual positive outcomes) of the various groups are significantly different.''
+        \item ``The notion permits that we accept the qualified applicants in
+        one demographic, but random individuals in another, so long as the
+        percentages of acceptance match.''
+        \item It ``often cripples the utility that we might hope to achieve,
+        especially in the common scenario in which an outcome to be predicated,
+        e.g. whether the loan be will defaulted, is correlated
+        with the protected attribute''
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Equalized Odds}
+    \begin{itemize}
+        \item Equalized odds is designed to address the downsides of the previous two
+        by taking into accounts the ``ground truths'' and consider
+        the difference between false-positive rates and true-positive rates of
+        the groups.
+        \item Formally, it requires that
+        \begin{align*}
+            \abs{P[\hat{Y} = 1 | S = 1, Y = 0] - P[\hat{Y} = 1 | S \neq 1, Y = 0]} & \leq \epsilon \\
+            \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} & \leq \epsilon
+        \end{align*}
+        where $Y$ represents ground truths.
+        \item A fully accurate classifier
+        will necessarily satisfy the two equalized odds constraints.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Equal Opportunity}
+    \begin{itemize}
+        \item Equal opportunity is similar to equalized odds but focuses
+        on true-positive rates of the groups only.
+        \item Formally, it requires that
+        \begin{align*}
+            \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} & \leq \epsilon
+        \end{align*}
+        where $Y$ represents ground truths.
+        \item It is a relaxation of equalized odds that focuses on the
+        typically considered ``advantaged'' group $Y = 1$. For example,
+        it ``requires that people who pay back their loan, have an equal
+        opportunity of getting the loan in the first place (without specifying
+        any requirement for those that will ultimately default).''
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{COMPAS}
+    \textbf{recidivism} \textit{noun} \\
+    \quad the tendency of a convicted criminal to reoffend.
+    \begin{columns}[T]
+        \begin{column}{.5\textwidth}
+            \centering
+            \includegraphics[width=.5\textwidth]{PRATER.jpg}
+            \footnotesize
+            \begin{itemize}
+                \item Prior Offenses: 2 armed robberies, 1 attempted armed robbery
+                \item Subsequent Offenses: 1 grand theft
+                \item Risk Score: 3
+            \end{itemize}
+        \end{column}
+        \begin{column}{.5\textwidth}
+            \centering
+            \includegraphics[width=.5\textwidth]{BORDEN.jpg}
+            \footnotesize
+            \begin{itemize}
+                \item Prior Offenses: 4 juvenile misdemeanors
+                \item Subsequent Offenses: None
+                \item Risk Score: 8
+            \end{itemize}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{COMPAS}
+    \begin{itemize}
+        \item COMPAS is an algorithm
+        used by U.S. courts for predicting recidivism(reoffending) based on a
+        questionaire.
+        \item Risk score: $s =  a(-w_1) + a_{1st} (-w_2) + h_{vio} w_3 + v_{edu} w_4 + h_{nc} w_5$
+        \item In 2016, ProPublica found that the algorithm is biased.
+        \begin{quote}
+            Black defendants were often predicted to be at a higher risk of recidivism than they actually were.
+            White defendants were often predicted to be less risky than they were.
+        \end{quote}
+        \item The false-positive rates vary significantly across
+        black people and white people, violating equalized odds.
+        \item Supreme Court ruled that it can be considered by judges during
+        sentencing, but there must be warnings about the tool's "limitations and cautions."
+    \end{itemize}
+    \footnotetext[1]{\href{https://www.propublica.org/article/how-we-analyzed-the-compas-recidivism-algorithm}{(Link) ProPublica - How We Analyzed the COMPAS Recidivism Algorithm}}
+    \footnotetext[2]{\href{https://www.youtube.com/watch?v=TqnYf2h6A-k}{(Link) Vsauce2 - The Dangerous Math Used To Predict Criminals}}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Individual Fairness}
+    \begin{itemize}
+        \item All of the above fairness measures consider fairness across groups,
+        while individual fairness requires that
+        similar individuals will be treated similarly.
+        \item Formally, it requires that
+        \begin{align*}
+            \abs{P[\hat{Y}^{(i)} = y | X^{(i)}, S^{(i)}] - P[\hat{Y}^{(j)} = y | X^{(j)}, S^{(j)}]} & \leq \epsilon \text{ if } d(i,j) \approx 0
+        \end{align*}
+        where $i,j$ denotes two individuals; $S^{(\cdot)}$ refers to sensitive attributes;
+        $X^{(\cdot)}$ refers to associated features; and $d(i, j)$ is a distance metric between individuals.
+        \item ``This measure considers other individual attributes for defining fairness rather
+        than just the sensitive attributes.''
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Other Measures}
+    \begin{itemize}
+        \item Overall accuracy equality:
+        \[
+            \abs{P[Y = \hat{Y} | S = 1] - P[Y = \hat{Y} | S \neq 1]} \leq \epsilon
+        \]
+        where $Y = \hat{Y}$ means that the prediction was correct.
+        \item Predictive parity:
+        \[
+            \abs{P[Y = 1 | S = 1, \hat{Y} = 1] - P[Y = 1 | S \neq 1, \hat{Y} = 1]} \leq \epsilon
+        \]
+        This requires that the ``positive predictive values'' are similar across
+        groups, meaning the probability of an individual with a positive prediction
+        actually experiencing a positive outcome.
+        \item Equal calibration:
+        \[
+            \abs{P[Y = 1 | S = 1, \hat{V} = v] - P[Y = 1 | S \neq 1, \hat{V} = v]} \leq \epsilon
+        \]
+        where $V$ is the predicted probability value. When $V$ is binary, this is equivalent to predictive parity.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Other Measures}
+    \begin{itemize}
+        \item Conditional statistical parity:
+        \[
+            \abs{P[\hat{Y} = 1 | S = 1, L = l] - P[\hat{Y} = 1 | S \neq 1, L = l]} \leq \epsilon
+        \]
+        where $L$ is a set of additional ``legitimate'' factors; for example, black and white
+        defendants who have the same number of prior convictions.
+        \item Predictive equality:
+        \[
+            \abs{P[\hat{Y} = 1 | S = 1, Y = 0] - P[\hat{Y} = 1 | S \neq 1, Y = 0]} \leq \epsilon
+        \]
+        This is similar to equal opportunity, but instead of focusing only on
+        true-positive, this focuses only on false-positive rates.
+        \item Conditional use accuracy equality:
+        \begin{align*}
+            \abs{P[Y = 1 | S = 1, \hat{Y} = 1] - P[Y = 1 | S \neq 1, \hat{Y} = 1]} & \leq \epsilon \\
+            % TODO: add inequality
+            \abs{P[Y = 0 | S = 1, \hat{Y} = 0] - P[Y = 0 | S \neq 1, \hat{Y} = 0]} & \leq \epsilon
+        \end{align*}
+        This is similar to predictive parity but it additionally requires
+        negative predictive values to be similar across groups.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Other Measures}
+    \begin{itemize}
+        \item Balance for the positive class:
+        \[
+            \abs{E[\hat{V} | Y = 1, S = 1] - E[\hat{V} | Y = 1, S \neq 1]} \leq \epsilon
+        \]
+        where V is the predicted probability value.
+        \item Balance for the negative class:
+        \[
+            \abs{E[\hat{V} | Y = 0, S = 1] - E[\hat{V} | Y = 0, S \neq 1]} \leq \epsilon
+        \]
+        where V is the predicted probability value.
+        \item Mean difference:
+        \[
+            \abs{E[\hat{Y}|S = 1] - E[\hat{Y}|S \neq 1]} \leq \epsilon
+        \]
+        This measures the difference between the means of the predictions across
+        groups. This is similar to demographic parity when the target
+        is binary.
+    \end{itemize}
+\end{frame}
+
+\end{document}
