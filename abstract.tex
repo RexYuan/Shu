@@ -96,6 +96,8 @@ For the following definition we will use $Y$ to denote the ground truth of an ou
 
 We denote by $S$ some protected attribute. Protected attributes are the characteristics of individuals that are, for example, legally or ethically, considered sensitive and warrant protection against discrimination and bias. We write $S = 1$ to represent the privileged group and $S \neq 1$ to represent the unprivileged group. For example, let $S$ be Caucasian. Then $S = 1$ represents the case of an individual's race being Caucasian and $S \neq 1$ vice versa.
 
+We denote by $\epsilon$ some threshold that's used to limit the fairness measures.
+
 \subsection{Disparate Impact}
 In 1971 \cite{griggs1971}, the US spreme court ruled that it is illegal for hiring decisions to have  ``disparate impact'' by race, thus coining the term. It is taken as unintentional discrimination, as opposed to intentional discrimination, which is called ``disparate treatment''.
 
@@ -104,6 +106,8 @@ Legal cases involving disparate impact often refer to the ``80\% Rule'', advocat
 \[
     \frac{P[\hat{Y} = 1 | S \neq 1]}{P[\hat{Y} = 1 | S = 1]} \geq 1 - \epsilon
 \]
+
+In the case of 80\% rule, $\epsilon = 20\%$.
 
 \subsection{Demographic Parity}
 Demographic parity, also known as statistical parity, is similar to disparate impact but, instead of ratio, difference is taken. It is named so to suggest that each demographic group(such as race, gender, or age) should have equal representation or opportunity. Formally, it is:
@@ -119,7 +123,7 @@ Conditional statistical parity is similar to demographic parity, but, in additio
     \abs{P[\hat{Y} = 1 | S = 1, L = l] - P[\hat{Y} = 1 | S \neq 1, L = l]} \leq \epsilon
 \]
 
-where $L$ to denotes the legitimate attributes.
+where $L$ denotes the legitimate attributes.
 
 \subsection{Overall Accuracy Equality}
 Accuracy eqaulity is similar to demographic parity, but instead of the case of $\hat{Y} = 1$, it considers the case of $Y = \hat{Y}$; that is, the case where the prediction is accurate. Formally, it is:
@@ -135,6 +139,27 @@ Mean difference considers the case of non-binary outcome, such as the score of C
     \abs{E[\hat{Y}|S = 1] - E[\hat{Y}|S \neq 1]} \leq \epsilon
 \]
 
+\subsection{Equalized Odds}
+Equalized odds is similar to demogrphic parity, but it further takes into account the grouth truth. It consider the cases of true positive and false positive. It solves the downsides of a fully accurate classifier might be deemed unfair by measures that don't take ground truth into consideration. For example, consider a group $A$ that is predicated to recidivate and they do in fact always recidivate and a group $B$ that is predicated to recidivate but end up never recidivating. A fully accurate classifier will always predict $A$ to recidivate while $B$ to never recidivate, and this will violate demogrphic parity. By taking ground truth into account, equalized odds avoids these pitfalls. Formally, it is:
+
+\begin{align*}
+    \abs{P[\hat{Y} = 1 | S = 1, Y = 0] - P[\hat{Y} = 1 | S \neq 1, Y = 0]} & \leq \epsilon \\
+    \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} & \leq \epsilon
+\end{align*}
+
+\subsection{Equal Opportunity}
+Equal opportunity is a relaxation of equalized odds by only considering the true positive case. It is named so because when outcome being positive is beneficial to the individual, as it is an opportunity, such as school acceptance, the fairness of the true positive case is much more important. Formally, it is:
+
+\begin{align*}
+    \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} & \leq \epsilon
+\end{align*}
+
+\subsection{Predictive Equality}
+Predictive equality is also a relaxation of equalized odds by only considering the false positive case. It was formulated \cite{corbett2017algorithmic} when considering outcome being positive is detrimental to the individual, such as future recidivism. Thus, the fairness of the false positive case is much more important. Formally, it is:
+
+\begin{align*}
+    \abs{P[\hat{Y} = 1 | S = 1, Y = 0] - P[\hat{Y} = 1 | S \neq 1, Y = 0]} \leq \epsilon
+\end{align*}
 
 \begin{table*}[h]
     \centering
