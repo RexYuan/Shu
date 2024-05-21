@@ -14,6 +14,7 @@
 \usepackage{ulem}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{cite}
 
 \begin{document}
 
@@ -86,10 +87,35 @@ This functionality not only facilitates sound judgment but also fosters objectiv
 
 Our tool is written in Python and is offered as a Python package. It supports common datasets format such as csv. It is open-sourced and publicly available for downloads.
 
-\begin{table}[h]
+\section{Fairness Measures}
+Fairness is about making sure the disadvantaged and unprivileged groups of individuals are treated equitably. However, there have been several conceptions of it proposed in the past. To have a constructive discussion on fairness, we must first have precise definitions of it. Pessach and Shmueli \cite{pessach2022review} formulated a number of fairness measures in an unified mathematical notation. We will base our framework on their formulation.
+
+\subsection{Preliminaries}
+For the following definition we will use $Y$ to denote the ground truth of an outcome; $\hat{Y}$ to denote the predicated result of an outcome; $Y = 1$ and $\hat{Y} = 1$ to denote them being accepted or positive. For example, let $Y$ be recidivism. Then $Y = 1$ means the case of an individual actually recidivating and $\hat{Y} = 0$ means the predication of an individual recidivating is negative.
+
+We denote by $S$ some protected attribute. Protected attributes are the characteristics of individuals that are, for example, legally or ethically, considered sensitive and warrant protection against discrimination and bias. We write $S = 1$ to represent the privileged group and $S \neq 1$ to represent the unprivileged group. For example, let $S$ be Caucasian. Then $S = 1$ represents the case of an individual's race being Caucasian and $S \neq 1$ vice versa.
+
+\subsection{Disparate Impact}
+In 1971 \cite{griggs1971}, the US spreme court ruled that it is illegal for hiring decisions to have  ``disparate impact'' by race, thus coining the term. It is taken as unintentional discrimination, as opposed to intentional discrimination, which is called ``disparate treatment''.
+
+Legal cases involving disparate impact often refer to the ``80\% Rule'', advocated by the US Equal Employment Opportunity Commission \cite{eeoc1979}, where it requires the selection rate of a minority group is to be no less than 80\% of that of a majority group. Formally, it is:
+
+\[
+    \frac{P[\hat{Y} = 1 | S \neq 1]}{P[\hat{Y} = 1 | S = 1]} \geq 1 - \epsilon
+\]
+
+\subsection{Demographic Parity}
+Demographic parity, also known as statistical parity, is similar to disparate impact but, instead of ratio, difference is taken. It is named so to suggest that each demographic group(such as race, gender, or age) should have equal representation or opportunity. Formally, it is:
+
+\[
+    \abs{P[\hat{Y} = 1 | S = 1] - P[\hat{Y} = 1 | S \neq 1]} \leq \epsilon
+\]
+
+
+\begin{table*}[h]
     \centering
     % \resizebox{\textwidth}{!}{
-    \resizebox{\columnwidth}{!}{
+    % \resizebox{\columnwidth}{!}{
     \begin{tabular}{|l|c|} % 'l' specifies left alignment for the first column
         \hline
         \textbf{Column 1} & \textbf{Column 2} \\
@@ -121,10 +147,27 @@ conditional use accuracy equality: true negative & $\abs{P[Y = 0 | S = 1, \hat{Y
 mean difference & $\abs{E[\hat{Y}|S = 1] - E[\hat{Y}|S \neq 1]} \leq \epsilon$ \\
         \hline
     \end{tabular}
-    }
+    % }
     \caption{Example Table}
     \label{tab:example}
-\end{table}
+\end{table*}
+
+
+\bye{
+fairness definition 1p
+    example
+
+framework definition 1p
+    abstraction
+
+framework example usage 1p
+    csv input
+    model input
+
+compas introduction
+
+compas analysis
+}
 
 
 
@@ -134,11 +177,8 @@ mean difference & $\abs{E[\hat{Y}|S = 1] - E[\hat{Y}|S \neq 1]} \leq \epsilon$ \
 
 
 
-
-
-
-
-
+\bibliographystyle{IEEEtran}
+\bibliography{references}
 
 \end{document}
 
