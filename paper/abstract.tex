@@ -97,6 +97,7 @@ This functionality not only facilitates sound judgment but also fosters objectiv
 Our tool is written in Python and is offered as a Python package. It supports common datasets format such as csv. It is open-sourced and publicly available for downloads.
 
 \section{Fairness Measures}
+\label{sec:measures}
 Fairness is about making sure the disadvantaged and unprivileged groups of individuals are treated equitably. However, there have been several interpretations of it proposed in the past. To have a constructive discussion on fairness, we must first have precise definitions of it. Pessach and Shmueli \cite{pessach2022review} formulated a number of fairness measures in an unified mathematical notation. We will base our framework on their formulation.
 
 \subsection{Preliminaries}
@@ -214,7 +215,7 @@ These fairness measures are compiled in Table~\ref{tab:measures}.
     % \resizebox{\columnwidth}{!}{
     \begin{tabular}{|l|c|} % 'l' specifies left alignment for the first column
         \hline
-        \textbf{Column 1} & \textbf{Column 2} \\
+        \textbf{Fairness Measure} & \textbf{Definition} \\
         \hline
 Disparate Impact & $\frac{P[\hat{Y} = 1 | S \neq 1]}{P[\hat{Y} = 1 | S = 1]} \geq 1 - \epsilon$ \\
 \hline
@@ -253,25 +254,26 @@ Negative Balance & $\abs{E[\hat{V} | Y = 0, S = 1] - E[\hat{V} | Y = 0, S \neq 1
 \end{table*}
 
 \section{Auditing Framework}
+\label{sec:framework}
 Per the review by Pessach and Shmueli \cite{pessach2022review}, we designed an auditing framework for calculating the various fairness measure. We offer two versions of fairness checkers: one for when the prediction positive results are readily available in csv input and one for when a model is provided. In most auditing cases the model version is preferred because csv result can be easily fabricated.
 
 \subsection{Preliminaries}
-Let $\db = \set{r_1, r_2, ...}$ be a database containing rows of data. Each row $r_i : \mathtt{str} \implies \mathtt{str}$ is a lookup table or dictionary. For example, $r_n(\text{``race''}) = \text{``Asian''}$ means $r_n$'s race is Asian.
+Let $\db = \set{r_1, r_2, ...}$ be a database containing rows of data. Each row $r_i : \mathtt{str} \implies \mathtt{str}$ is a lookup table or dictionary. For example, $r_n(\text{``sex''}) = \text{``Female''}$ means $r_n$'s sex is female.
 
 A model $\model : (\mathtt{str} \implies \mathtt{str}) \implies \alpha$ takes a row and returns the model's prediction result of some type $\alpha$.
 
-A privileged predicate $\priv : (\mathtt{str} \implies \mathtt{str}) \implies \mathtt{bool}$ takes a row and determines if it belongs to the privileged group.
+A privileged predicate $\priv : (\mathtt{str} \implies \mathtt{str}) \implies \mathtt{bool}$ takes a row and determines if it belongs to the privileged group. For example, $\priv(r_i) := r_i(\text{``race''}) == \text{``Caucasian''}$ means the privileged group is those with race being Caucasian.
 
-A positive predicate of rows $\pos : (\mathtt{str} \implies \mathtt{str}) \implies \mathtt{bool}$ takes a row and determines if its prediction is positive. A positive predicate of model results $\pos : \alpha \implies \mathtt{bool}$ takes a model's result and determines if it is positive.
+A positive predicate of rows $\pos : (\mathtt{str} \implies \mathtt{str}) \implies \mathtt{bool}$ takes a row and determines if its prediction is positive. For example, $\pos(r_i) := \mathtt{int}(r_i(\text{``score''})) > \text{``7''}$ means a row's prediction is positive if its score is greater than 7. A positive predicate of model results $\pos : \alpha \implies \mathtt{bool}$ takes a model's result and determines if it is positive. In the simplest case, the model returns a $\mathtt{bool}$, and the positive predicate can just be the idnetity function.
 
 A ground truth predicate $\tru : (\mathtt{str} \implies \mathtt{str}) \implies \mathtt{bool}$ takes a row and gives the ground truth of the result.
 
-A legitimate predicate $\leg : \alpha_i^n \implies (\mathtt{str} \implies \mathtt{str}) \implies \mathtt{bool}$, and similarly a score predicate $\sco : \alpha_i^n \implies (\mathtt{str} \implies \mathtt{str}) \implies \mathtt{bool}$, takes $n$ parameters and returns a row predicate.
+A legitimate predicate $\leg : \alpha_i^n \implies (\mathtt{str} \implies \mathtt{str}) \implies \mathtt{bool}$, and similarly a score predicate $\sco : \alpha_i^n \implies (\mathtt{str} \implies \mathtt{str}) \implies \mathtt{bool}$, takes $n$ parameters and returns a row predicate. For example, $\sco(u, l)(r_i) := l < \mathtt{int}(r_i(\text{``score''})) < u$ first takes two parameters $u,l$ as upper bound and lower bound, and then decides if $r_i$'s prediction score is between them.
 
 \subsection{Definitions}
-We abstracted the idea of privileged groups and positive prediction as predicates to maximizes flexibility. With the proper predicates, any model output can be used; even prose like response of generative models can be included given adequate predicates.
+We abstracted the idea of privileged groups and positive prediction as predicates to maximizes flexibility. With the proper predicates, any model output can be used; even prose-like response of generative models can be included given adequate predicates.
 
-Given a datasets for auditing use, and given csv prediction results or the prediction model itself, we can calculate the fairness measures by:
+Given a datasets for auditing use, and given csv prediction results or the prediction model itself, we can calculate the fairness measures mentioned in Section~\ref{sec:measures} by:
 
 \begin{align*}
 \text{disparate\_impact} & (\epsilon, \model, \priv, \pos) \\
@@ -291,9 +293,16 @@ Given a datasets for auditing use, and given csv prediction results or the predi
 
 where $\mathcal{M}$ is optional if the input contains csv prediction results.
 
+By calculating all of the available fairness measures, we provide the auditors a more comprehensive perespective on a model or dataset.
 
+\section{Application}
+\label{sec:app}
+In this section, we will apply the framework proposed in Section~\ref{sec:framework} to the ProPublica COMPAS dataset.
 
+\subsection{ProPublica COMPAS Dataset}
+Correctional Offender Management Profiling for Alternative Sanctions (COMPAS), developed by private company Northpointe (now Equivant), is a risk assessment software used in the American criminal justice system to evaluate the likelihood of a defendant reoffending.
 
+ProPublica is an American non-profit organization focused on investigative journalism in public interests. In 2016, they conduct a
 
 
 
