@@ -16,6 +16,7 @@
 \usepackage{graphicx}
 \usepackage{cite}
 \usepackage{multirow}
+\usepackage{makecell}
 
 \begin{document}
 
@@ -293,39 +294,98 @@ Given a datasets for auditing use, and given csv prediction results or the predi
 
 where $\mathcal{M}$ is optional if the input contains csv prediction results.
 
-By calculating all of the available fairness measures, we provide the auditors a more comprehensive perespective on a model or dataset.
+By calculating all of the available fairness measures, we provide the auditors a comprehensive perespective on the fairness performance of a model or dataset.
 
-\section{Application}
+\subsection{Application}
 \label{sec:app}
-In this section, we will apply the framework proposed in Section~\ref{sec:framework} to the ProPublica COMPAS dataset.
+In this section, we will apply the proposed framework to the ProPublica COMPAS dataset \cite{angwin2016machine,larson2016compas,larson2016propublica}.
 
-\subsection{ProPublica COMPAS Dataset}
-Correctional Offender Management Profiling for Alternative Sanctions (COMPAS), developed by private company Northpointe (now Equivant), is a risk assessment software used in the American criminal justice system to evaluate the likelihood of a defendant reoffending.
+Correctional Offender Management Profiling for Alternative Sanctions (COMPAS), developed by private company Northpointe (now Equivant), is a risk assessment software used in the American criminal justice system to evaluate the likelihood of a defendant reoffending. Defendants taking the COMPAS test are given a questionnaire about topics ranging from family history to personal ideology. The questionnaire are then fed to the software system along with a number of parameters like the defendants's age, and then the system will assign a risk score to them from 1-10, with 10 being the highest risk.
 
-ProPublica is an American non-profit organization focused on investigative journalism in public interests. In 2016, they conduct a
+ProPublica is an American non-profit journalism organization focused on public interests. In 2016, they conduct an investigative report into the COMPAS system. They obtained the 2013-2014 COMPAS score data of over 10,000 defendants in Florida. They also obtained criminal records of these defendants through 2016 and compared if they actually recidivate or not. They only counted misdemeanors and felonies as recidivism but not less serious crimes such as infractions. In the study, they've found that black defendants are disproportionately scored higher than they actually are and white defendants are disproportionately scored lower than they actually are.
 
+We shall start applying our framework. There's generally no formal guide on how to set $\epsilon$, so we will take the 80\% rule's case and set it as $\epsilon = 0.2$. For the $\epsilon$ of positive and negative balance, we shall use $\epsilon = 5$ as it is a reasonable choice.
 
+Although this dataset scenario falls in the csv-as-input case in our framework, and thus the model $\model$ input isn't needed, we also trained two simple makeshift models using the dataset itself for demonstration that simply outputs binary $\mathtt{bool}$ prediction, ``will recidivate'' and ``will not recidivate'', and $\mathtt{int}$ risk score, $1$ to $10$. The model was trained by splitting the original dataset into 3 partitions: 60\% of the data was used for training; 20\% was used for validation; and the rest 20\% was used for calculating fairness measures. The accuracy of the binary model was about 60\% and the accuracy of the score model was about 25\%.
 
+We will set the privileged predicate be to ``non-African-American'' so that the unprivileged group will be African-American to test if the African-American race is discriminated.
+\[
+    \priv(r_i) := r_i(\text{``race''}) \neq \text{``African-American''}
+\]
 
-\bye{
-fairness definition 1p
-    example
+As ProPublica referenced Northpointe's COMPAS Practitioners Guide and cited that ``medium''(5-7) and ``high''(8-10) categories of scores are considered to indicate a risk of recidivism, we set the positive predicate using the readily available category.
+\[
+    \pos(r_i) := r_i(\text{``score\_text''}) \in \set{\text{``Medium''},\text{``High''}}
+\]
+Alternatively, since we know the corresponding scores of the categories, we can define it using the scores themselves, too.
+\[
+    \pos(r_i) := 5 \leq \mathtt{int}(r_i(\text{``decile\_score''})) \leq 10
+\]
+On the other hand, when we're taking prediction input from our makeshift model, we simply return its result because it already gives a binary $\mathtt{bool}$ result: $\pos(r_i) := \model(r_i)$
 
-framework definition 1p
-    abstraction
+For the ground truth predicate, the recidivism data is already present in the ProPublica dataset, so all we have to do is a simple lookup.
+\[
+    \tru(r_i) := r_i(\text{``two\_year\_recid''}) == \text{``1''}
+\]
 
-framework example usage 1p
-    csv input
-    model input
+For the legitimate predicate, we may want to look at defendants with priors.
+\[
+    \leg(x)(r_i) := \mathtt{int}(r_i(\text{``priors\_count''})) > x
+\]
 
-compas introduction
+For the score predicate, we may want to specifically look at risk scores between a specifically range.
+\[
+    \sco(u,l)(r_i) := l \leq \mathtt{int}(r_i(\text{``decile\_score''})) \leq u
+\]
 
-compas analysis
-}
+With these predicates defined, we can call the fairness measure functions and check if the measure hold or not. The results are compiled in Table~\ref{tab:results}. Since some of the fairness measures are equivalent, we write them in the same entry.
 
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|c|} % 'l' specifies left alignment for the first column
+        \hline
+        \textbf{Fairness Measure} & \textbf{Criterion} & \textbf{Pass} \\
+        \hline
+Disparate Impact & 1.81 > 0.8 & YES \\
+\hline
+Demographic Parity & 0.26 < 0.2 & NO \\
+\hline
+Conditional Statistical Parity & 0.25 < 0.2 & NO \\
+\hline
+Overall Accuracy Equality & 0.02 < 0.2 & YES \\
+\hline
+Mean Difference & 0.26 < 0.2 & NO \\
+\hline
+\makecell[l]{Equalized Odds (true positive) \\ Equal Opportunity} & 0.23 < 0.2 & NO \\
+\hline
+\makecell[l]{Equalized Odds (false positive) \\ Predictive Equality} & 0.22 < 0.2 & NO \\
+\hline
+\makecell[l]{Conditional Use Accuracy Equality (true positive) \\ Predictive Parity} & 0.06 < 0.2 & YES \\
+\hline
+Conditional Use Accuracy Equality (true negative) & 0.06 < 0.2 & YES \\
+\hline
+Equal Calibration & 0.03 < 0.2 & YES \\
+\hline
+Positive Balance & 1.6 < 5 & YES \\
+\hline
+Negative Balance & 1.4 < 5 & YES \\
+\hline
+    \end{tabular}
+    \caption{Fairness measures of privileged group being non-African-American.}
+    \label{tab:results}
+\end{table}
 
+On first blush, it is curious that it satisfies disparate impact but not demographic parity. However, if we return to the definition, we'd see that disparate impact is meant to be used when being marked positive is an advantaged thing, while here in the COMPAS exmaple, being marked positive is a disadvantaged thing. Thus, henceforth we will exclude disparate impact from our analysis.
 
+We can then immediately tell from it failing demographic parity, mean difference, and conditional statistical parity that COMPAS prediction results was unfair against African-American, even if we only consider the ones with prior crimes.
 
+From the low overall accuracy equality and both conditional use accuracy equality criteria we can tell that the accuracy is similar across African-Americans and non-African-Americans.
+
+From failing both equalized odds criteria we can conclude that African-Americans are indeed treated unequally by the COMPAS system even after the ground truth is taken into account. This is the same conclusion reached by the ProPublica report.
+
+From the low equal calibration we can tell that if we only consider the medium risk score, African-Americans aren't treated unequally.
+
+Finally, if we look at positive and negative balance, we can see that they're of similar numbers. However, not much else can be said since the criterion $\epsilon = 5$ isn't actually justified.
 
 
 
