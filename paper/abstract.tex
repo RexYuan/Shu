@@ -328,12 +328,12 @@ For the ground truth predicate, the recidivism data is already present in the Pr
     \tru(r_i) := r_i(\text{``two\_year\_recid''}) == \text{``1''}
 \]
 
-For the legitimate predicate, we may want to look at defendants with priors.
+For the legitimate predicate, we may want to look at defendants with priors. Here we shall set $args = (0)$.
 \[
     \leg(x)(r_i) := \mathtt{int}(r_i(\text{``priors\_count''})) > x
 \]
 
-For the score predicate, we may want to specifically look at risk scores between a specifically range.
+For the score predicate, we may want to specifically look at risk scores between a specifically range. Here we shall set $args = (7,5)$.
 \[
     \sco(u,l)(r_i) := l \leq \mathtt{int}(r_i(\text{``decile\_score''})) \leq u
 \]
@@ -377,13 +377,13 @@ Negative Balance & 1.4 < 5 & YES \\
 
 On first blush, it is curious that it satisfies disparate impact but not demographic parity. However, if we return to the definition, we'd see that disparate impact is meant to be used when being marked positive is an advantaged thing, while here in the COMPAS exmaple, being marked positive is a disadvantaged thing. Thus, henceforth we will exclude disparate impact from our analysis.
 
-We can then immediately tell from it failing demographic parity, mean difference, and conditional statistical parity that COMPAS prediction results was unfair against African-American, even if we only consider the ones with prior crimes.
+We can then immediately tell from the failing demographic parity, mean difference, and conditional statistical parity that COMPAS prediction results was unfair against African-American, even if we only consider the ones with prior crimes.
 
 From the low overall accuracy equality and both conditional use accuracy equality criteria we can tell that the accuracy is similar across African-Americans and non-African-Americans.
 
-From failing both equalized odds criteria we can conclude that African-Americans are indeed treated unequally by the COMPAS system even after the ground truth is taken into account. This is the same conclusion reached by the ProPublica report.
+From the failing equalized odds we can conclude that African-Americans are indeed treated unequally by the COMPAS system even after the ground truth is taken into account. This is the same conclusion reached by the ProPublica report.
 
-From the low equal calibration we can tell that if we only consider the medium risk score, African-Americans aren't treated unequally.
+From the low equal calibration we can tell that if we only consider the medium risk score, African-Americans aren't treated fairly.
 
 Finally, if we look at positive and negative balance, we can see that they're of similar numbers. However, not much else can be said since the criterion $\epsilon = 5$ isn't actually justified.
 
