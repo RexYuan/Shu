@@ -300,7 +300,7 @@ where $\mathcal{M}$ is optional if the input contains csv prediction results.
 
 By calculating all of the available fairness measures, we provide the auditors a comprehensive perespective on the fairness performance of a model or dataset.
 
-%TODO package url
+We implemented the framework in Python and it is available as an public domain open-sourced Python package at \url{https://pypi.org/project/fairness-checker/}.
 
 \subsection{Application}
 \label{sec:app}
@@ -393,9 +393,17 @@ From the low equal calibration we can tell that if we only consider the medium r
 
 Finally, if we look at positive and negative balance, we can see that they're of similar numbers. However, not much else can be said since the criterion $\epsilon = 5$ isn't actually justified.
 
-Setting the privilege predicate to different races we can have a more comprehensive look over the dataset. We've checked the case of privilege predicate being Non-African-American, Non-Asian, Non-Caucasian, Non-Hispanic, and Non-Native-American. The results are shown in Figure~\ref{fig:compas}.
+Setting the privilege predicate to different races we can have a more comprehensive look over the dataset. We've checked the case of privilege predicate being Non-African-American, Non-Asian, Non-Caucasian, Non-Hispanic, and Non-Native American. The results are shown in Figure~\ref{fig:compas}.
 
-From the results we can first notice that the overall accuracy eqaulity is low for both the Non-Asian and Non-Native-American case. This can be explained by checking the original dataset which shows that there are only 32 and 18 rows, respectivly, in dataset of 7214 rows. Hence, the accuracy is naturally lower because of the small data size.
+From the results we can first notice that the overall accuracy eqaulity is low for both the Non-Asian and Non-Native American case. This can be explained by checking the original dataset which shows that there are only 32 and 18 rows, respectivly, in dataset of 7214 rows. Hence, the accuracy is naturally lower because of the small data size.
+
+Looking at the remaining three groups, Non-African-American, Non-Caucasian, and Non-Hispanic, their accuracy are relatively much better.
+
+As for fairness measures, we can immediately see from that all measures are $\epsilon < 0.2$ for Non-Caucasian and Non-Hispanic that African-American are indeed treated unfairly in a broad sense.
+
+More specifically, African-American are treated more unfairly according to demographic parity, conditional statistical parity, mean difference, and equalized odds. This is again in accordance with the conclusion of the ProPublica report.
+
+
 
 \begin{figure*}[h]
     \centering
@@ -407,14 +415,20 @@ From the results we can first notice that the overall accuracy eqaulity is low f
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
         \centering
+        \includegraphics[width=\linewidth]{Non-Caucasian}
+        \subcaption{Privileged Group: Non-Caucasian}\label{fig:2}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.48\linewidth}
+        \centering
         \includegraphics[width=\linewidth]{Non-Asian}
         \subcaption{Privileged Group: Non-Asian}\label{fig:2}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
         \centering
-        \includegraphics[width=\linewidth]{Non-Caucasian}
-        \subcaption{Privileged Group: Non-Caucasian}\label{fig:2}
+        \includegraphics[width=\linewidth]{Non-Native American}
+        \subcaption{Privileged Group: Non-Native American}\label{fig:2}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
@@ -425,10 +439,10 @@ From the results we can first notice that the overall accuracy eqaulity is low f
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
         \centering
-        \includegraphics[width=\linewidth]{Non-Native-American}
-        \subcaption{Privileged Group: Non-Native-American}\label{fig:2}
+        \includegraphics[width=\linewidth]{race balance}
+        \subcaption{Balance}\label{fig:2}
     \end{minipage}
-    \caption{Fairness Measures of ProPublica COMPAS dataset}
+    \caption{Fairness Measures of ProPublica COMPAS dataset grouped by race}
     \label{fig:compas}
 \end{figure*}
 
