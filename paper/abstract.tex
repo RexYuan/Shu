@@ -17,6 +17,10 @@
 \usepackage{cite}
 \usepackage{multirow}
 \usepackage{makecell}
+\usepackage{url}
+
+\graphicspath{{images/}}
+\DeclareGraphicsExtensions{.pdf}
 
 \begin{document}
 
@@ -296,6 +300,8 @@ where $\mathcal{M}$ is optional if the input contains csv prediction results.
 
 By calculating all of the available fairness measures, we provide the auditors a comprehensive perespective on the fairness performance of a model or dataset.
 
+%TODO package url
+
 \subsection{Application}
 \label{sec:app}
 In this section, we will apply the proposed framework to the ProPublica COMPAS dataset \cite{angwin2016machine,larson2016compas,larson2016propublica}.
@@ -371,7 +377,7 @@ Positive Balance & 1.6 < 5 & YES \\
 Negative Balance & 1.4 < 5 & YES \\
 \hline
     \end{tabular}
-    \caption{Fairness measures of privileged group being non-African-American.}
+    \caption{Fairness measures of privileged group being Non-African-American.}
     \label{tab:results}
 \end{table}
 
@@ -387,9 +393,44 @@ From the low equal calibration we can tell that if we only consider the medium r
 
 Finally, if we look at positive and negative balance, we can see that they're of similar numbers. However, not much else can be said since the criterion $\epsilon = 5$ isn't actually justified.
 
+Setting the privilege predicate to different races we can have a more comprehensive look over the dataset. We've checked the case of privilege predicate being Non-African-American, Non-Asian, Non-Caucasian, Non-Hispanic, and Non-Native-American. The results are shown in Figure~\ref{fig:compas}.
 
+From the results we can first notice that the overall accuracy eqaulity is low for both the Non-Asian and Non-Native-American case. This can be explained by checking the original dataset which shows that there are only 32 and 18 rows, respectivly, in dataset of 7214 rows. Hence, the accuracy is naturally lower because of the small data size.
 
-
+\begin{figure*}[h]
+    \centering
+    \begin{minipage}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Non-African-American}
+        \subcaption{Privileged Group: Non-African-American}\label{fig:1}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Non-Asian}
+        \subcaption{Privileged Group: Non-Asian}\label{fig:2}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Non-Caucasian}
+        \subcaption{Privileged Group: Non-Caucasian}\label{fig:2}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Non-Hispanic}
+        \subcaption{Privileged Group: Non-Hispanic}\label{fig:2}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.48\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Non-Native-American}
+        \subcaption{Privileged Group: Non-Native-American}\label{fig:2}
+    \end{minipage}
+    \caption{Fairness Measures of ProPublica COMPAS dataset}
+    \label{fig:compas}
+\end{figure*}
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
