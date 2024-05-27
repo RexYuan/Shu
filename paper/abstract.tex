@@ -18,6 +18,7 @@
 \usepackage{multirow}
 \usepackage{makecell}
 \usepackage{url}
+\usepackage{placeins}
 
 \graphicspath{{images/}}
 \DeclareGraphicsExtensions{.pdf}
@@ -403,7 +404,13 @@ As for fairness measures, we can immediately see from that all measures are $\ep
 
 More specifically, African-American are treated more unfairly according to demographic parity, conditional statistical parity, mean difference, and equalized odds. This is again in accordance with the conclusion of the ProPublica report.
 
+On the other hand, we also analyzed the case of unprivileged group being across the three age groups and the case of privileged group of sex being Male and charged degree being misdemeanor in Figure~\ref{fig:compas2}.
 
+We can see that, interestingly, the group of age ``25 - 45'' group receives generally fair treatment. Its data size is also the largest at 4109 rows, whereas ``Less than 25'' age group has 1529 rows and ``Greater than 45'' age group has 1576 rows, so the possibility of skewed data is unlikely.
+
+If we look closer we can see that in the age group ``Less than 25'', its predictive equality is noticeably worse, meaning in young people false positive rate is higher than older people; conversely, when we look at the age group ``Greater than 45'', both equal opportunity and predictive equality are worse, meaning for old people their treatment is even more unfair than young people. Only the middle age group is treated fairly.
+
+In another vein, the case of ``Male'' group and ``Misdemeanor'' group are both treated rather fairly. Furthermore, their overeal accuracy equality are both extremely good at the $< 0.1$ range. The predictive equality  of ``Male'' group even has a measure as low as $0.000004$.
 
 \begin{figure*}[h]
     \centering
@@ -451,31 +458,31 @@ More specifically, African-American are treated more unfairly according to demog
     \begin{minipage}[b]{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{Non-Less than 25}
-        \subcaption{Privileged Group: Non-African-American}\label{fig:1}
+        \subcaption{Privileged Group: Non-Less than 25}\label{fig:1}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{Male}
-        \subcaption{Privileged Group: Non-Caucasian}\label{fig:2}
+        \subcaption{Privileged Group: Male}\label{fig:2}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{Non-25 - 45}
-        \subcaption{Privileged Group: Non-Asian}\label{fig:2}
+        \subcaption{Privileged Group: Non-25 - 45}\label{fig:2}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{Misdemeanor}
-        \subcaption{Privileged Group: Non-Native American}\label{fig:2}
+        \subcaption{Privileged Group: Misdemeanor}\label{fig:2}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{Non-Greater than 45}
-        \subcaption{Privileged Group: Non-Hispanic}\label{fig:2}
+        \subcaption{Privileged Group: Non-Greater than 45}\label{fig:2}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
@@ -486,6 +493,8 @@ More specifically, African-American are treated more unfairly according to demog
     \caption{Fairness measures of ProPublica COMPAS dataset grouped by age, sex, and charged degree}
     \label{fig:compas2}
 \end{figure*}
+
+\FloatBarrier
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
