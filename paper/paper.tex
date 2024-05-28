@@ -50,7 +50,7 @@ email address or ORCID}
 
 \newcommand{\db}{\mathcal{D}}
 \newcommand{\model}{\mathcal{M}}
-\newcommand{\priv}{P}
+\newcommand{\priv}{R}
 \newcommand{\pos}{\hat{P}}
 \newcommand{\tru}{T}
 \newcommand{\leg}{L}
@@ -109,7 +109,8 @@ Fairness is about making sure the disadvantaged and unprivileged groups of indiv
 \subsection{Preliminaries}
 For the following definition we will use $Y$ to denote the ground truth of an outcome; $\hat{Y}$ to denote the predicated result of an outcome; $Y = 1$ and $\hat{Y} = 1$ to denote them being accepted or positive. For example, let $Y$ be recidivism. Then $Y = 1$ means the case of an individual actually recidivating and $\hat{Y} = 0$ means the predication of an individual recidivating is negative. In addition, we use $V$ and $\hat{V}$ when the truth and the prediction isn't binary. For example, we denote COMPAS score by $\hat{V}$, which ranges from 1 to 10.
 
-We denote by $S$ some protected attribute. Protected attributes are the characteristics of individuals that are, for example, legally or ethically, considered sensitive and warrant protection against discrimination and bias. We write $S = 1$ to represent the privileged group and $S \neq 1$ to represent the unprivileged group. For example, let $S$ be Caucasian. Then $S = 1$ represents the case of an individual's race being Caucasian and $S \neq 1$ vice versa.
+%TODO emph
+Protected attributes are the characteristics of individuals that are, for example, legally or ethically, considered sensitive and warrant protection against discrimination and bias. We denote by $S$ some protected attribute. We write $S = 1$ to represent the privileged group and $S \neq 1$ to represent the unprivileged group. For example, let $S$ be Caucasian. Then $S = 1$ represents the case of an individual's race being Caucasian and $S \neq 1$ vice versa.
 
 We denote by $\epsilon$ some threshold that's used to limit the fairness measures.
 
@@ -263,14 +264,18 @@ Negative Balance & $\abs{E[\hat{V} | Y = 0, S = 1] - E[\hat{V} | Y = 0, S \neq 1
 \label{sec:framework}
 Per the review by Pessach and Shmueli \cite{pessach2022review}, we designed an auditing framework for calculating the various fairness measure. We offer two versions of fairness checkers: one for when the prediction positive results are readily available in csv input and one for when a model is provided. In most auditing cases the model version is preferred because csv result can be easily fabricated.
 
-\subsection{Preliminaries}
+\subsection{Notations}
+%TODO add function type alpha to beta
+%TODO replace str -> str to key -> value concretely theyre strings
+%TODO replace key -> value with row type
+%TODO new definite use emph
 Let $\db = \set{r_1, r_2, ...}$ be a database containing rows of data. Each row $r_i : \mathtt{str} \implies \mathtt{str}$ is a lookup table or dictionary. For example, $r_n(\text{``sex''}) = \text{``Female''}$ means $r_n$'s sex is female.
 
 A model $\model : (\mathtt{str} \implies \mathtt{str}) \implies \alpha$ takes a row and returns the model's prediction result of some type $\alpha$.
 
 A privileged predicate $\priv : (\mathtt{str} \implies \mathtt{str}) \implies \mathtt{bool}$ takes a row and determines if it belongs to the privileged group. For example, $\priv(r_i) := r_i(\text{``race''}) == \text{``Caucasian''}$ means the privileged group is those with race being Caucasian.
 
-A positive predicate of rows $\pos : (\mathtt{str} \implies \mathtt{str}) \implies \mathtt{bool}$ takes a row and determines if its prediction is positive. For example, $\pos(r_i) := \mathtt{int}(r_i(\text{``score''})) > \text{``7''}$ means a row's prediction is positive if its score is greater than 7. A positive predicate of model results $\pos : \alpha \implies \mathtt{bool}$ takes a model's result and determines if it is positive. In the simplest case, the model returns a $\mathtt{bool}$, and the positive predicate can just be the idnetity function.
+A positive predicate of rows $\pos : (\mathtt{str} \implies \mathtt{str}) \implies \mathtt{bool}$ takes a row and determines if its prediction is positive. For example, $\pos(r_i) := \mathtt{int}(r_i(\text{``score''})) > 7$ means a row's prediction is positive if its score is greater than 7. A positive predicate of model results $\pos : \alpha \implies \mathtt{bool}$ takes a model's result and determines if it is positive. In the simplest case, the model returns a $\mathtt{bool}$, and the positive predicate can just be the idnetity function.
 
 A ground truth predicate $\tru : (\mathtt{str} \implies \mathtt{str}) \implies \mathtt{bool}$ takes a row and gives the ground truth of the result.
 
@@ -280,6 +285,8 @@ A legitimate predicate $\leg : \alpha_i^n \implies (\mathtt{str} \implies \matht
 We abstracted the idea of privileged groups and positive prediction as predicates to maximizes flexibility. With the proper predicates, any model output can be used; even prose-like response of generative models can be included given adequate predicates.
 
 Given a datasets for auditing use, and given csv prediction results or the prediction model itself, we can calculate the fairness measures mentioned in Section~\ref{sec:measures} by:
+
+%TODO: explain priv pos relationship with Y S
 
 \begin{align*}
 \text{disparate\_impact} & (\epsilon, \model, \priv, \pos) \\
@@ -303,7 +310,8 @@ By calculating all of the available fairness measures, we provide the auditors a
 
 We implemented the framework in Python and it is available as an public domain open-sourced Python package at \url{https://pypi.org/project/fairness-checker/}.
 
-\subsection{Application}
+\section{Application}
+\subsection{Setup}
 \label{sec:app}
 In this section, we will apply the proposed framework to the ProPublica COMPAS dataset \cite{angwin2016machine,larson2016compas,larson2016propublica}.
 
@@ -382,6 +390,7 @@ Negative Balance & 1.4 < 5 & YES \\
     \label{tab:results}
 \end{table}
 
+\subsection{Fairness Analysis of African-American group}
 On first blush, it is curious that it satisfies disparate impact but not demographic parity. However, if we return to the definition, we'd see that disparate impact is meant to be used when being marked positive is an advantaged thing, while here in the COMPAS exmaple, being marked positive is a disadvantaged thing. Thus, henceforth we will exclude disparate impact from our analysis.
 
 We can then immediately tell from the failing demographic parity, mean difference, and conditional statistical parity that COMPAS prediction results was unfair against African-American, even if we only consider the ones with prior crimes.
@@ -392,8 +401,11 @@ From the failing equalized odds we can conclude that African-Americans are indee
 
 From the low equal calibration we can tell that if we only consider the medium risk score, African-Americans aren't treated fairly.
 
+%TODO: on a scale of 10, we have 1.5  difference on avg, and it remains to be said that if this is fair, should consult expert by letting them choose epsilon
+%TODO: remove epsilon=5
 Finally, if we look at positive and negative balance, we can see that they're of similar numbers. However, not much else can be said since the criterion $\epsilon = 5$ isn't actually justified.
 
+\subsection{Fairness Analysis of Different Races}
 Setting the privilege predicate to different races we can have a more comprehensive look over the dataset. We've checked the case of privilege predicate being Non-African-American, Non-Asian, Non-Caucasian, Non-Hispanic, and Non-Native American. The results are shown in Figure~\ref{fig:compas}.
 
 From the results we can first notice that the overall accuracy eqaulity is low for both the Non-Asian and Non-Native American case. This can be explained by checking the original dataset which shows that there are only 32 and 18 rows, respectivly, in dataset of 7214 rows. Hence, the accuracy is naturally lower because of the small data size.
@@ -404,6 +416,7 @@ As for fairness measures, we can immediately see from that all measures are $\ep
 
 More specifically, African-American are treated more unfairly according to demographic parity, conditional statistical parity, mean difference, and equalized odds. This is again in accordance with the conclusion of the ProPublica report.
 
+\subsection{Fairness Analysis of Different Groups}
 On the other hand, we also analyzed the case of unprivileged group being across the three age groups and the case of privileged group of sex being Male and charged degree being misdemeanor in Figure~\ref{fig:compas2}.
 
 We can see that, interestingly, the group of age ``25 - 45'' group receives generally fair treatment. Its data size is also the largest at 4109 rows, whereas ``Less than 25'' age group has 1529 rows and ``Greater than 45'' age group has 1576 rows, so the possibility of skewed data is unlikely.
@@ -413,6 +426,7 @@ If we look closer we can see that in the age group ``Less than 25'', its predict
 In another vein, the case of ``Male'' group and ``Misdemeanor'' group are both treated rather fairly. Furthermore, their overeal accuracy equality are both extremely good at the $< 0.1$ range. The predictive equality  of ``Male'' group even has a measure as low as $0.000004$.
 
 \section{Conclusion}
+%TODO: mention we're white box
 Addressing the challenges brought upon by the rapid advancements in AI technologies and its introduced bias necessitates a rigorous assessment of AI system fairness. While fairness is subjective and, it can be defined through various statistical measures. Our research contributes to this effort by proposing a comprehensive framework for auditing AI systems using multiple fairness metrics, such as demographic parity, equalized odds, and overall accuracy equality.
 
 By applying this framework to the COMPAS dataset, we confirmed that African-American defendants were unfairly scored compared to other racial groups. These results align with ProPublica's findings, demonstrating the utility and accuracy of our fairness auditing tool. Developed in Python and publicly available, this tool enables third parties to conduct detailed assessments of AI systems, promoting transparency and accountability.
