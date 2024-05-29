@@ -295,8 +295,8 @@ class fairness_model_checker:
                           ratio: float,
                           model: object,
                           privileged_predicate: Callable[[csv_row], bool],
-                          score_predicate_h: Callable[..., Callable[[csv_row], bool]],
-                          score_arg: Tuple[Any, ...],
+                          calib_predicate_h: Callable[..., Callable[[csv_row], bool]],
+                          calib_arg: Tuple[Any, ...],
                           truth_predicate: Callable[[csv_row], bool]) -> bool:
         """
         Evaluates the equal calibration of the model's predictions between privileged and unprivileged groups.
@@ -320,10 +320,10 @@ class fairness_model_checker:
                 privileged_Y_pred = model.predict('privileged.csv')
                 unprivileged_Y_pred = model.predict('unprivileged.csv')
 
-        score_predicate = score_predicate_h(*score_arg)
+        calib_predicate = calib_predicate_h(*calib_arg)
 
-        privileged_score = list(filter(lambda row_Y: score_predicate(row_Y[1]), zip(privileged, privileged_Y_pred)))
-        unprivileged_score = list(filter(lambda row_Y: score_predicate(row_Y[1]), zip(unprivileged, unprivileged_Y_pred)))
+        privileged_score = list(filter(lambda row_Y: calib_predicate(row_Y[1]), zip(privileged, privileged_Y_pred)))
+        unprivileged_score = list(filter(lambda row_Y: calib_predicate(row_Y[1]), zip(unprivileged, unprivileged_Y_pred)))
 
         privileged_score = list(map(lambda row_Y: row_Y[0], privileged_score))
         unprivileged_score = list(map(lambda row_Y: row_Y[0], unprivileged_score))
@@ -819,8 +819,8 @@ class fairness_csv_checker:
     def equal_calibration(self,
                           ratio: float,
                           privileged_predicate: Callable[[csv_row], bool],
-                          score_predicate_h: Callable[..., Callable[[csv_row], bool]],
-                          score_arg: Tuple[Any, ...],
+                          calib_predicate_h: Callable[..., Callable[[csv_row], bool]],
+                          calib_arg: Tuple[Any, ...],
                           truth_predicate: Callable[[csv_row], bool]) -> bool:
         """
         Evaluates the equal calibration of the model's predictions between privileged and unprivileged groups.
@@ -834,10 +834,10 @@ class fairness_csv_checker:
         Returns:
         bool: If the input model satisfies the required fairness threshold ratio.
         """
-        score_predicate = score_predicate_h(*score_arg)
+        calib_predicate = calib_predicate_h(*calib_arg)
 
-        privileged_score = list(filter(lambda row: privileged_predicate(row) and score_predicate(row), self.reader))
-        unprivileged_score = list(filter(lambda row: not privileged_predicate(row) and score_predicate(row), self.reader))
+        privileged_score = list(filter(lambda row: privileged_predicate(row) and calib_predicate(row), self.reader))
+        unprivileged_score = list(filter(lambda row: not privileged_predicate(row) and calib_predicate(row), self.reader))
 
         privileged_positive_truth = list(filter(lambda row: truth_predicate(row), privileged_score))
         unprivileged_positive_truth = list(filter(lambda row: truth_predicate(row), unprivileged_score))
