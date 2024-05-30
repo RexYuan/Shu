@@ -118,46 +118,38 @@ We denote by $\epsilon$ some threshold that's used to limit the fairness measure
 In 1971 \cite{griggs1971}, the US spreme court ruled that it is illegal for hiring decisions to have  ``disparate impact'' by race, thus coining the term. It is taken as unintentional discrimination, as opposed to intentional discrimination, which is called ``disparate treatment''.
 
 Legal cases involving disparate impact often refer to the ``80\% Rule'', advocated by the US Equal Employment Opportunity Commission \cite{eeoc1979}, where it requires the selection rate of a minority group is to be no less than 80\% of that of a majority group. Formally \cite{feldman2015certifying}, it is:
-
 \[
     \frac{P[\hat{Y} = 1 | S \neq 1]}{P[\hat{Y} = 1 | S = 1]} \geq 1 - \epsilon
 \]
-
 In the case of 80\% rule, $\epsilon = 20\%$.
 
 \subsection{Demographic Parity} %TODO: why cite this?
 Demographic parity \cite{calders2010three}, also known as statistical parity, is similar to disparate impact but, instead of ratio, difference is taken. It is named so to suggest that each demographic group(such as race, gender, or age) should have equal representation or opportunity. Formally, it is:
-
 \[
     \abs{P[\hat{Y} = 1 | S = 1] - P[\hat{Y} = 1 | S \neq 1]} \leq \epsilon
 \]
 
 \subsection{Conditional Statistical Parity}
 Conditional statistical parity \cite{corbett2017algorithmic} is similar to demographic parity, but, in addition to protected attributes, it further takes into account some ``legitimate'' attributes that are \textit{legitimately} related to the case. For example, a legitimate attribute when considering future recidivism could be the number of prior crimes committed. Formally, it is:
-
 \[
     \abs{P[\hat{Y} = 1 | S = 1, L = l] - P[\hat{Y} = 1 | S \neq 1, L = l]} \leq \epsilon
 \]
-
 where $L$ denotes the legitimate attributes.
 
 \subsection{Overall Accuracy Equality}
 Overall accuracy eqaulity \cite{berk2021fairness} is similar to demographic parity, but instead of the case of $\hat{Y} = 1$, it considers the case of $Y = \hat{Y}$; that is, the case where the prediction is accurate. Formally, it is:
-
 \[
     \abs{P[Y = \hat{Y} | S = 1] - P[Y = \hat{Y} | S \neq 1]} \leq \epsilon
 \]
 
 \subsection{Mean Difference}
 Mean difference \cite{vzliobaite2017measuring} considers the case of non-binary outcome, such as the score of COMPAS. It takes the expected value of the prediction. Formally, it is:
-
 \[
     \abs{E[\hat{Y}|S = 1] - E[\hat{Y}|S \neq 1]} \leq \epsilon
 \]
 
 \subsection{Equalized Odds}
 Equalized odds \cite{hardt2016equality} is similar to demogrphic parity, but it further takes into account the grouth truth. It consider the cases of true positive and false positive. It solves the downsides of a fully accurate classifier might be deemed unfair by measures that don't take ground truth into consideration. For example, consider a group $A$ that is predicated to recidivate and they do in fact always recidivate and a group $B$ that is predicated to recidivate but end up never recidivating. A fully accurate classifier will always predict $A$ to recidivate while $B$ to never recidivate, and this will violate demogrphic parity. By taking ground truth into account, equalized odds avoids these pitfalls. Formally, it is:
-
 \begin{align*}
     \abs{P[\hat{Y} = 1 | S = 1, Y = 0] - P[\hat{Y} = 1 | S \neq 1, Y = 0]} & \leq \epsilon \\
     \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} & \leq \epsilon
@@ -165,21 +157,18 @@ Equalized odds \cite{hardt2016equality} is similar to demogrphic parity, but it 
 
 \subsection{Equal Opportunity}
 Equal opportunity \cite{hardt2016equality} is a relaxation of equalized odds by only considering the true positive case. It is named so because when outcome being positive is beneficial to the individual, as it is an opportunity, such as school acceptance, the fairness of the true positive case is much more important. Formally, it is:
-
 \begin{align*}
     \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} & \leq \epsilon
 \end{align*}
 
 \subsection{Predictive Equality}
 Predictive equality \cite{corbett2017algorithmic} is also a relaxation of equalized odds by only considering the false positive case. It was formulated by considering positive outcome being detrimental to the individual, such as predicting future recidivism. Thus, only the false positive case is taken. Formally, it is:
-
 \begin{align*}
     \abs{P[\hat{Y} = 1 | S = 1, Y = 0] - P[\hat{Y} = 1 | S \neq 1, Y = 0]} \leq \epsilon
 \end{align*}
 
 \subsection{Conditional Use Accuracy Equality}
 Conditional use accuracy equality \cite{berk2021fairness} is similar to equalized odds, but instead of conditioning on the ground truth, it conditions on the prediction and calculated the probability of the ground truth. It can be seem as checking the prediction accuracy across groups, thus the name. It further requires the measure on the case of positive predictive values is less than that of the negative predictive values. Formally, it is:
-
 \begin{align*}
     \abs{P[Y = 1 | S = 1, \hat{Y} = 1] & - P[Y = 1 | S \neq 1, \hat{Y} = 1]} && \leq \epsilon \\
     & \rotatebox{90}{>} && \\
@@ -188,28 +177,24 @@ Conditional use accuracy equality \cite{berk2021fairness} is similar to equalize
 
 \subsection{Predictive Parity}
 Predictive parity \cite{chouldechova2017fair} is a relaxation of conditional use accuracy equality by only considering the positive predictive value case. Like predictive equality, it was formulated by considering positive outcome being detrimental to the individual. Thus, only the positive predictive value case is taken. Formally, it is:
-
 \begin{align*}
     \abs{P[Y = 1 | S = 1, \hat{Y} = 1] - P[Y = 1 | S \neq 1, \hat{Y} = 1]} \leq \epsilon
 \end{align*}
 
 \subsection{Equal Calibration}
 Equal calibration \cite{chouldechova2017fair} is similar to equal opportunity, but instead of having a binary $\hat{Y}$, it is conditioned on the range of the predicted value $\hat{V}$. For example, this could be conditioned on the highest COMPAS score $\hat{V} = 10$. Calibration is a concept of having fair score function \cite{fraenkel2020fairness}. Formally, it is:
-
 \begin{align*}
     \abs{P[Y = 1 | S = 1, \hat{V} = v] - P[Y = 1 | S \neq 1, \hat{V} = v]} \leq \epsilon
 \end{align*}
 
 \subsection{Positive Balance}
 Positive balance \cite{kleinberg2016inherent} is similar to equal opportunity, but instead of taking the difference of probability of binary prediction $\hat{Y}$, it takes the difference of the expected value of the score $\hat{V}$. Formally, it is:
-
 \begin{align*}
     \abs{E[\hat{V} | Y = 1, S = 1] - E[\hat{V} | Y = 1, S \neq 1]} \leq \epsilon
 \end{align*}
 
 \subsection{Negative Balance}
 Negative balance \cite{kleinberg2016inherent} is like positive balance except it conditions on the case of $Y = 0$. Formally, it is:
-
 \begin{align*}
     \abs{E[\hat{V} | Y = 0, S = 1] - E[\hat{V} | Y = 0, S \neq 1]} \leq \epsilon
 \end{align*}
