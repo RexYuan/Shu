@@ -5,7 +5,7 @@ with open("src/README.md", "r") as f:
 
 setup(
     name="fairness_checker",
-    version="0.0.2",
+    version="0.0.3",
     package_dir={'': 'src'},
     packages=find_packages(where="src"),
     description="Fairnes checker",
@@ -15,4 +15,5 @@ setup(
     author="RexYuan",
     author_email="hello@rexyuan.com",
     license="Unlicense",
+    python_requires=">=3.6",
 )
