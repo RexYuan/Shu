@@ -91,9 +91,9 @@ AI system, however, may be biased. Factors such as inherent biases in original d
 
 Correctional Offender Management Profiling for Alternative Sanctions (COMPAS) is a tool for predicting recidivism---the tendency of criminals to reoffend. It is used in the criminal justice system in multiple states in the United States. In 2016, it was discovered in an investigation by the journalists at ProPublica that the COMPAS system is, in fact, unfair towards minority and disadvantaged groups.
 
-Cases such as COMPAS underscore the critical importance of rigorously examining the fairness of AI systems by third parties. Fairness is fundementally a subjective social construct, heavily influenced by cultural context and deeply rooted in historical inequalities. However, there have been development in research leveraging statistical metrics to quantify fairness that provide transparent and objective insights.
+Cases such as COMPAS underscore the critical importance of rigorously examining the fairness of AI systems by third parties. Fairness is fundamentally a subjective social construct, heavily influenced by cultural context and deeply rooted in historical inequalities. However, there have been development in research leveraging statistical metrics to quantify fairness that provide transparent and objective insights.
 
-By employing such mathematically rigorous methodologies, our research can offer a more deeper look into the fairness of AI systems, enabling third parties to make more informed and robust judgment. For example, it would reveal that the COMPAS system violates a fairness measure called equalized odds.
+By employing such mathematically rigorous methodologies, our research can offer a deeper look into the fairness of AI systems, enabling third parties to make more informed and robust judgment. For example, it would reveal that the COMPAS system violates a fairness measure called equalized odds.
 
 In addition to equalized odds, there are a number of fairness measures for AI systems. Our framework aims to help third parties apply these metrics and navigate complex datasets with ease, pinpointing instances of bias and discrimination.
 
@@ -101,11 +101,11 @@ With our tool, a third party such as ProPublica could clearly and easily demonst
 
 This functionality not only facilitates sound judgment but also fosters objectivity and transparency regarding AI systems, ultimately bolster the claim of fairness and justice in AI-enabled decision-making.
 
-Our tool is written in Python and is offered as a Python package. It supports common datasets format such as csv. It is open-sourced and publicly available for downloads.
+Our tool is written in Python and is offered as a Python package. It supports common datasets format such as CSV. It is open-sourced and publicly available for downloads.
 
 \section{Fairness Measures}
 \label{sec:measures}
-Fairness is about making sure the disadvantaged and unprivileged groups of individuals are treated equitably. However, there have been several interpretations of it proposed in the past. To have a constructive discussion on fairness, we must first have precise definitions of it. Pessach and Shmueli \cite{pessach2022review} formulated a number of fairness measures in an unified mathematical notation. We will base our framework on their formulation.
+Fairness is about making sure the disadvantaged and unprivileged groups of individuals are treated equitably. However, there have been several interpretations of it proposed in the past. To have a constructive discussion on fairness, we must first have precise definitions of it. Pessach and Shmueli \cite{pessach2022review} formulated a number of fairness measures in a unified mathematical notation. We will base our framework on their formulation.
 
 \subsection{Preliminaries}
 For the following definition we will use $Y$ to denote the ground truth of an outcome; $\hat{Y}$ to denote the predicated result of an outcome; $Y = 1$ and $\hat{Y} = 1$ to denote them being accepted or positive. For example, let $Y$ be recidivism. Then $Y = 1$ means the case of an individual actually recidivating and $\hat{Y} = 0$ means the predication of an individual recidivating is negative. In addition, we use $V$ and $\hat{V}$ when the truth and the prediction isn't binary. For example, we denote COMPAS score by $\hat{V}$, which ranges from 1 to 10.
@@ -114,10 +114,10 @@ For the following definition we will use $Y$ to denote the ground truth of an ou
 
 We denote by $\epsilon$ some threshold that is used to limit the fairness measures.
 
-%TODO: explain various measures have different origins. for presentation we assume Y=1 to be detrimental. use comaps as example and the intuition is Y=1 => reoffend; but if the case is school or loan the tuition is reversed
+A positive outcome or prediction may be either beneficial or detrimental to the individual in different cases. Various measures were devised when considering different scenarios. For presentation, we consider $Y=1$ to be the detrimental case, like in the COMPAS prediction scenarios.
 
 \subsection{Disparate Impact}
-In 1971 \cite{griggs1971}, the US spreme court ruled that it is illegal for hiring decisions to have  ``disparate impact'' by race, thus coining the term. It is taken as unintentional discrimination, as opposed to intentional discrimination, which is called ``disparate treatment''.
+In 1971 \cite{griggs1971}, the US Supreme Court ruled that it is illegal for hiring decisions to have  ``disparate impact'' by race, thus coining the term. It is taken as unintentional discrimination, as opposed to intentional discrimination, which is called ``disparate treatment''.
 
 Legal cases involving disparate impact often refer to the ``80\% Rule'', advocated by the US Equal Employment Opportunity Commission \cite{eeoc1979}, where it requires the selection rate of a minority group is to be no less than 80\% of that of a majority group. Formally \cite{feldman2015certifying}, it is:
 \[
@@ -139,40 +139,38 @@ Conditional statistical parity \cite{corbett2017algorithmic} is similar to demog
 where $L$ denotes the legitimate attributes.
 
 \subsection{Overall Accuracy Equality}
-Overall accuracy eqaulity \cite{berk2021fairness} is similar to demographic parity, but instead of the case of $\hat{Y} = 1$, it considers the case of $Y = \hat{Y}$; that is, the case where the prediction is accurate. Formally, it is:
+Overall accuracy equality \cite{berk2021fairness} is similar to demographic parity, but instead of the case of $\hat{Y} = 1$, it considers the case of $Y = \hat{Y}$; that is, the case where the prediction is accurate. Formally, it is:
 \[
     \abs{P[Y = \hat{Y} | S = 1] - P[Y = \hat{Y} | S \neq 1]} \leq \epsilon
 \]
 
 \subsection{Mean Difference}
-%TODO: rewrite, move compas example to positive balance
-Mean difference \cite{vzliobaite2017measuring} considers the case of non-binary outcome, such as the score of COMPAS. It takes the expected value of the prediction. Formally, it is:
+Mean difference \cite{vzliobaite2017measuring} considers the expected value of the prediction. Formally, it is:
 \[
     \abs{E[\hat{Y}|S = 1] - E[\hat{Y}|S \neq 1]} \leq \epsilon
 \]
 
 \subsection{Equalized Odds}
-Equalized odds \cite{hardt2016equality} is similar to demogrphic parity, but it further takes into account the grouth truth. It consider the cases of true positive and false positive. It solves the downsides of a fully accurate classifier might be deemed unfair by measures that don't take ground truth into consideration. For example, consider a group $A$ that is predicated to recidivate and they do in fact always recidivate and a group $B$ that is predicated to recidivate but end up never recidivating. A fully accurate classifier will always predict $A$ to recidivate while $B$ to never recidivate, and this will violate demogrphic parity. By taking ground truth into account, equalized odds avoids these pitfalls. Formally, it is:
+Equalized odds \cite{hardt2016equality} is similar to demographic parity, but it further takes into account the ground truth. It considers the cases of true positive and false positive. It solves the downsides of a fully accurate classifier might be deemed unfair by measures that don't take ground truth into consideration. For example, consider a group $A$ that is predicated to recidivate and they do in fact recidivate and a group $B$ that is predicated to recidivate but end up never recidivating. A fully accurate classifier will always predict $A$ to recidivate while $B$ to never recidivate, and this will violate demographic parity. By taking ground truth into account, equalized odds avoids these pitfalls. Formally, it is:
 \begin{align*}
     \abs{P[\hat{Y} = 1 | S = 1, Y = 0] - P[\hat{Y} = 1 | S \neq 1, Y = 0]} & \leq \epsilon \\
     \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} & \leq \epsilon
 \end{align*}
 
 \subsection{Equal Opportunity}
-%TODO: rewrite use footnote to explain name origin
-Equal opportunity \cite{hardt2016equality} is a relaxation of equalized odds by only considering the true positive case. It is named so because when outcome being positive is beneficial to the individual, as it is an opportunity, such as school acceptance, the fairness of the true positive case is much more important. Formally, it is:
+Equal opportunity \footnote{It was named so by considering the cases where positive outcomes benefit individuals, such as school admissions, hence the word opportunity.} \cite{hardt2016equality} is a relaxation of equalized odds by only considering the true positive case. Formally, it is:
 \begin{align*}
     \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} & \leq \epsilon
 \end{align*}
 
 \subsection{Predictive Equality}
-Predictive equality \cite{corbett2017algorithmic} is also a relaxation of equalized odds by only considering the false positive case. It was formulated by considering positive outcome being detrimental to the individual, such as predicting future recidivism. Thus, only the false positive case is taken. Formally, it is:
+Predictive equality \cite{corbett2017algorithmic} is also a relaxation of equalized odds by only considering the false positive case. Formally, it is:
 \begin{align*}
     \abs{P[\hat{Y} = 1 | S = 1, Y = 0] - P[\hat{Y} = 1 | S \neq 1, Y = 0]} \leq \epsilon
 \end{align*}
 
 \subsection{Conditional Use Accuracy Equality}
-Conditional use accuracy equality \cite{berk2021fairness} is similar to equalized odds, but instead of conditioning on the ground truth, it conditions on the prediction and calculated the probability of the ground truth. It can be seem as checking the prediction accuracy across groups, thus the name. It further requires the measure on the case of positive predictive values is less than that of the negative predictive values. Formally, it is:
+Conditional use accuracy equality \cite{berk2021fairness} is similar to equalized odds, but instead of conditioning on the ground truth, it conditions on the prediction and calculated the probability of the ground truth. It can be seen as checking the prediction accuracy across groups, thus the name. It further requires the measure on the case of positive predictive values is less than that of the negative predictive values. Formally, it is:
 \begin{align*}
     \abs{P[Y = 1 | S = 1, \hat{Y} = 1] & - P[Y = 1 | S \neq 1, \hat{Y} = 1]} && \leq \epsilon \\
     & \rotatebox{90}{>} && \\
@@ -180,8 +178,7 @@ Conditional use accuracy equality \cite{berk2021fairness} is similar to equalize
 \end{align*}
 
 \subsection{Predictive Parity}
-%TODO: rewrite, set positive = detrimental to all cases
-Predictive parity \cite{chouldechova2017fair} is a relaxation of conditional use accuracy equality by only considering the positive predictive value case. Like predictive equality, it was formulated by considering positive outcome being detrimental to the individual. Thus, only the positive predictive value case is taken. Formally, it is:
+Predictive parity \cite{chouldechova2017fair} is a relaxation of conditional use accuracy equality by only considering the positive predictive value case. Formally, it is:
 \begin{align*}
     \abs{P[Y = 1 | S = 1, \hat{Y} = 1] - P[Y = 1 | S \neq 1, \hat{Y} = 1]} \leq \epsilon
 \end{align*}
@@ -193,7 +190,7 @@ Equal calibration \cite{chouldechova2017fair} is similar to equal opportunity, b
 \end{align*}
 
 \subsection{Positive Balance}
-Positive balance \cite{kleinberg2016inherent} is similar to equal opportunity, but instead of taking the difference of probability of binary prediction $\hat{Y}$, it takes the difference of the expected value of the score $\hat{V}$. Formally, it is:
+Positive balance \cite{kleinberg2016inherent} is similar to equal opportunity, but instead of taking the difference of probability of binary prediction $\hat{Y}$, it takes the difference of the expected value of the score $\hat{V}$, which may be non-binary, such as the score of COMPAS. Formally, it is:
 \begin{align*}
     \abs{E[\hat{V} | Y = 1, S = 1] - E[\hat{V} | Y = 1, S \neq 1]} \leq \epsilon
 \end{align*}
@@ -220,7 +217,7 @@ Demographic Parity & $\abs{P[\hat{Y} = 1 | S = 1] - P[\hat{Y} = 1 | S \neq 1]} \
 \hline
 Conditional Statistical Parity & $\abs{P[\hat{Y} = 1 | S = 1, L = l] - P[\hat{Y} = 1 | S \neq 1, L = l]} \leq \epsilon$ \\
 \hline
-Overall Accuracy Eqaulity & $\abs{P[Y = \hat{Y} | S = 1] - P[Y = \hat{Y} | S \neq 1]} \leq \epsilon$ \\
+Overall Accuracy Equality & $\abs{P[Y = \hat{Y} | S = 1] - P[Y = \hat{Y} | S \neq 1]} \leq \epsilon$ \\
 \hline
 Mean Difference & $\abs{E[\hat{Y}|S = 1] - E[\hat{Y}|S \neq 1]} \leq \epsilon$ \\
 \hline
@@ -252,42 +249,42 @@ Negative Balance & $\abs{E[\hat{V} | Y = 0, S = 1] - E[\hat{V} | Y = 0, S \neq 1
 
 \section{Auditing Framework}
 \label{sec:framework}
-Per the review by Pessach and Shmueli \cite{pessach2022review}, we designed an auditing framework for calculating the various fairness measure. We offer two versions of fairness checkers: one for when the prediction positive results are readily available in csv input and one for when a model is provided. In most auditing cases the model version is preferred because csv result can be easily fabricated.
+Per the review by Pessach and Shmueli \cite{pessach2022review}, we designed an auditing framework for calculating the various fairness measure. We offer two versions of fairness checkers: one for when the prediction positive results are readily available in CSV input and one for when a model is provided. In most auditing cases the model version is preferred because CSV result can be easily fabricated.
 
 \subsection{Notations}
-Types $\alpha,\beta$ are stand-ins for any type. Let $\alpha \implies \beta$ denote a function from type $\alpha$ to type $\beta$. $\alpha^n$ denotes multiple instances of type $\alpha$; $\alpha_i$ denotes some particular type; $\alpha_i^n$ denotes multiple instances of possibly different types. We write $x : \alpha$ to mean $x$ is of the type $\alpha$.
+Types $\alpha,\beta$ are stand-ins for any type. Let $\alpha \implies \beta$ denote a function from type $\alpha$ to type $\beta$. $\alpha_i$ denotes some particular type; $\prod_i \alpha_i$ denotes the Cartesian product of multiple $\alpha$ of possibly different types. We write $x : \alpha$ to mean $x$ is of the type $\alpha$. We write $\mathtt{str}$ for the string type, $\mathtt{bool}$ for the boolean type, and $\mathtt{int}$ for the integer type.
 
-A \emph{database} $\db = \set{r_1, r_2, ...}$ is a collection of rows. A \emph{row} $r_i : \mathtt{key} \implies \mathtt{value}$ is a lookup table or dictionary, where the concrete type of $\mathtt{key}$ and $\mathtt{value}$ is $\mathtt{str}$. For example, $r_n(\text{``sex''}) = \text{``Female''}$ means $r_n$'s sex is female. Henceforth we will use $\mathtt{row}$ as a type synonym of $\mathtt{key} \implies \mathtt{value}$.
+A \emph{database} $\db = \set{r_1, r_2, ...}$ is a collection of rows. A \emph{row} $r_i : \mathtt{key} \implies \mathtt{value}$ is a lookup table or dictionary, where the concrete type of $\mathtt{key}$ and $\mathtt{value}$ is $\mathtt{str}$. For example, $r_n(\text{``sex''}) = \text{``Female''}$ means $r_n$'s sex is female. Henceforth, we will use $\mathtt{row}$ as a type synonym of $\mathtt{key} \implies \mathtt{value}$.
 
-A \emph{model} $\model : \mathtt{row} \implies \alpha$ is a black-box predictor that takes a row and returns the its prediction result of some type $\alpha$; for example, if the model returns a string then $\alpha = \mathtt{str}$.
+A \emph{model} $\model : \mathtt{row} \implies \alpha$ is a black-box predictor that takes a row and returns its prediction result of some type $\alpha$; for example, if the model returns a string then $\alpha = \mathtt{str}$.
 
 A \emph{privileged predicate} $\priv : \mathtt{row} \implies \mathtt{bool}$ takes a row and determines if it belongs to the privileged group. For example, $\priv(r_i) := r_i(\text{``race''}) == \text{``Caucasian''}$ means the privileged group is those with race being Caucasian.
 
-A \emph{positive predicate} of rows $\pos : \mathtt{row} \implies \mathtt{bool}$ takes a row and determines if its prediction is positive. For example, $\pos(r_i) := \mathtt{int}(r_i(\text{``score''})) > 7$ means a row's prediction is positive if its score is greater than 7. A positive predicate of model results $\pos : \alpha \implies \mathtt{bool}$ takes a model's result and determines if it is positive. In the simplest case, the model returns a $\mathtt{bool}$, and the positive predicate can just be the idnetity function.
+A \emph{positive predicate} of rows $\pos : \mathtt{row} \implies \mathtt{bool}$ takes a row and determines if its prediction is positive. For example, $\pos(r_i) := \mathtt{int}(r_i(\text{``score''})) > 7$ means a row's prediction is positive if its score is greater than 7. A positive predicate of model results $\pos : \alpha \implies \mathtt{bool}$ takes a model's result and determines if it is positive. In the simplest case, the model returns a $\mathtt{bool}$, and the positive predicate can just be the identity function.
 
 A \emph{score predicate} of rows $\sco : \mathtt{row} \implies \alpha$ takes a row and gives its predicted score. Similar to positive predicate, a score predicate of model results $\sco : \alpha \implies \beta$ takes a model's result and gives its score.
 
 A \emph{ground truth predicate} $\tru : \mathtt{row} \implies \mathtt{bool}$ takes a row and gives the ground truth of the result.
 
-A \emph{legitimate predicate} $\leg : \alpha_i^n \implies \mathtt{row} \implies \mathtt{bool}$ takes $n$ parameters and returns a row predicate. For example, $\leg(x)(r_i) := \mathtt{int}(r_i(\text{``priors\_count''})) > x$ first take a parameter $x$ and then decides if priors count is larger than it.
+A \emph{legitimate predicate} $\leg : \prod_i \alpha_i \implies \mathtt{row} \implies \mathtt{bool}$ takes $n$ parameters and returns a row predicate. For example, $\leg(x)(r_i) := \mathtt{int}(r_i(\text{``priors\_count''})) > x$ first take a parameter $x$ and then decides if priors count is larger than it.
 
-A \emph{calibration predicate} $\calib : \alpha_i^n \implies \mathtt{row} \implies \mathtt{bool}$, takes $n$ parameters and returns a row predicate. For example, $\calib(u, l)(r_i) := l < \mathtt{int}(r_i(\text{``score''})) < u$ first takes two parameters $u,l$ as upper bound and lower bound, and then decides if $r_i$'s prediction score is between them.
+A \emph{calibration predicate} $\calib : \prod_i \alpha_i \implies \mathtt{row} \implies \mathtt{bool}$, takes $n$ parameters and returns a row predicate. For example, $\calib(u, l)(r_i) := l < \mathtt{int}(r_i(\text{``score''})) < u$ first takes two parameters $u,l$ as upper bound and lower bound, and then decides if $r_i$'s prediction score is between them.
 
 \subsection{Definitions}
-We abstracted the idea of privileged groups and positive prediction as predicates to maximizes flexibility. With the proper predicates, any model output can be used; even prose-like response of generative models can be included given adequate predicates.
+We abstracted the idea of privileged groups and positive prediction as predicates to maximize flexibility. With the proper predicates, any model output can be used; even prose-like response of generative models can be included given adequate predicates.
 
-Given a datasets $\db$ for auditing use, and given csv prediction results or the prediction model $\model$ itself, we can calculate the fairness measures by modeling the statistical random variables mentioned in Section~\ref{sec:measures} with our predicates.
+Given a dataset $\db$ for auditing use, and given CSV prediction results or the prediction model $\model$ itself, we can calculate the fairness measures by modeling the statistical random variables mentioned in Section~\ref{sec:measures} with our predicates. We demonstrate this process in the following for a few selected measures; all the other measures can be modeled similarly.
 
-For a simple exmaple, for equal opportunity, recall its formal definition.
+For equal opportunity, recall its formal definition:
 \begin{align*}
     \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} \leq \epsilon
 \end{align*}
-To model the $Y$, $\hat{Y}$, and $S$, we we define the corresponding $\tru$, $\pos$, and $\priv$. We have $Y = 1$ if and only if $\tru$ is true; $\hat{Y} = 1$ if and only if $\pos$ is true; $S = 1$ if and only if $\priv$ is true; and vice versa.
+To model the $Y$, $\hat{Y}$, and $S$, we define the corresponding $\tru$, $\pos$, and $\priv$. We have $Y = 1$ if and only if $\tru$ is true; $\hat{Y} = 1$ if and only if $\pos$ is true; $S = 1$ if and only if $\priv$ is true; and vice versa.
 \begin{align*}
     \text{equal\_opportunity} (\epsilon, \model, \priv, \pos, \tru)
 \end{align*}
 
-For positive balance, recall its formal definition.
+For positive balance, its formal definition is:
 \begin{align*}
     \abs{E[\hat{V} | Y = 0, S = 1] - E[\hat{V} | Y = 0, S \neq 1]} \leq \epsilon
 \end{align*}
@@ -296,7 +293,7 @@ We model $Y$ and $S$ as the previous example. As for $\hat{V}$ we have it equal 
     \text{positive\_balance} (\epsilon, \model, \priv, \sco, \tru)
 \end{align*}
 
-For another exmaple, recall the formal definition of equal calibration.
+For equal calibration, recall its formal definition:
 \begin{align*}
     \abs{P[Y = 1 | S = 1, \hat{V} = v] - P[Y = 1 | S \neq 1, \hat{V} = v]} \leq \epsilon
 \end{align*}
@@ -332,25 +329,22 @@ This way, we can calculate each conditions programmatically by testing if the pr
 \text{nagative\_balance} & (\epsilon, \model, \priv, \sco, \tru) \\
 \end{align*}
 
-where $\mathcal{M}$ is optional if the input contains csv prediction results.
+where $\mathcal{M}$ is optional if the input contains CSV prediction results.
 
-By calculating all of the available fairness measures, we provide the auditors a comprehensive perespective on the fairness performance of a model or dataset.
+By calculating all the available fairness measures, we provide the auditors a comprehensive perspective on the fairness performance of a model or dataset.
 
-We implemented the framework in Python and it is available as an public domain open-sourced Python package at \url{https://pypi.org/project/fairness-checker/}.
+We implemented the framework in Python, and it is available as a public domain open-sourced Python package at \url{https://pypi.org/project/fairness-checker/}.
 
 \section{Application}
 \subsection{Setup}
 \label{sec:app}
 In this section, we will apply the proposed framework to the ProPublica COMPAS dataset \cite{angwin2016machine,larson2016compas,larson2016propublica}.
 
-Correctional Offender Management Profiling for Alternative Sanctions (COMPAS), developed by private company Northpointe (now Equivant), is a risk assessment software used in the American criminal justice system to evaluate the likelihood of a defendant reoffending. Defendants taking the COMPAS test are given a questionnaire about topics ranging from family history to personal ideology. The questionnaire are then fed to the software system along with a number of parameters like the defendants's age, and then the system will assign a risk score to them from 1-10, with 10 being the highest risk.
+Correctional Offender Management Profiling for Alternative Sanctions (COMPAS), developed by private company Northpointe (now Equivant), is a risk assessment software used in the American criminal justice system to evaluate the likelihood of a defendant reoffending. Defendants taking the COMPAS test are given a questionnaire about topics ranging from family history to personal ideology. The questionnaire is then fed to the software system along with a number of parameters like the defendants' age, and then the system will assign a risk score to them from 1-10, with 10 being the highest risk.
 
-ProPublica is an American non-profit journalism organization focused on public interests. In 2016, they conduct an investigative report into the COMPAS system. They obtained the 2013-2014 COMPAS score data of over 10,000 defendants in Florida. They also obtained criminal records of these defendants through 2016 and compared if they actually recidivate or not. They only counted misdemeanors and felonies as recidivism but not less serious crimes such as infractions. In the study, they've found that black defendants are disproportionately scored higher than they actually are and white defendants are disproportionately scored lower than they actually are.
+ProPublica is an American non-profit journalism organization focused on public interests. In 2016, they conduct an investigative report into the COMPAS system. They obtained the 2013-2014 COMPAS score data of over 10,000 defendants in Florida. They also obtained criminal records of these defendants through 2016 and compared if they actually recidivate or not. They only counted misdemeanors and felonies as recidivism but not less serious crimes such as infractions. In the study, they've found that black defendants are disproportionately scored higher than they actually are, and white defendants are disproportionately scored lower than they actually are.
 
 We shall start applying our framework. There is generally no formal guide on how to set $\epsilon$, so we will take the 80\% rule's case and set it as $\epsilon = 0.2$. For the $\epsilon$ of positive and negative balance, we shall use $\epsilon = 5$ as it is a reasonable choice.
-
-%TODO: move this to the back and choose one measure to comapre with compas
-Although this dataset scenario falls in the csv-as-input case in our framework, and thus the model $\model$ input isn't needed, we also trained two simple makeshift models using the dataset itself for demonstration that simply outputs binary $\mathtt{bool}$ prediction, ``will recidivate'' and ``will not recidivate'', and $\mathtt{int}$ risk score, $1$ to $10$. The model was trained by splitting the original dataset into 3 partitions: 60\% of the data was used for training; 20\% was used for validation; and the rest 20\% was used for calculating fairness measures. The accuracy of the binary model was about 60\% and the accuracy of the score model was about 25\%.
 
 We will set the privileged predicate be to ``non-African-American'' so that the unprivileged group will be African-American to test if the African-American race is discriminated.
 \[
@@ -372,19 +366,22 @@ For the ground truth predicate, the recidivism data is already present in the Pr
     \tru(r_i) := r_i(\text{``two\_year\_recid''}) == \text{``1''}
 \]
 
-%TODO: for score predicate
+For the score predicate, it is again a simple lookup.
+\[
+    \sco(r_i) := \mathtt{int}(r_i(\text{``decile\_score''}))
+\]
 
 For the legitimate predicate, we may want to look at defendants with priors. Here we shall set $args = (0)$.
 \[
     \leg(0)(r_i) := \mathtt{int}(r_i(\text{``priors\_count''})) > 0
 \]
 
-For the calibration predicate, we may want to specifically look at risk scores between a specifically range. Here we shall set $args = (7,5)$.
+For the calibration predicate, we may want to look at risk scores between a specific range. Here we shall set $args = (7,5)$.
 \[
     \calib(7,5)(r_i) := 5 \leq \mathtt{int}(r_i(\text{``decile\_score''})) \leq 7
 \]
 
-With these predicates defined, we can call the fairness measure functions and check if the measure hold or not. The results are compiled in Table~\ref{tab:results}. Since some of the fairness measures are equivalent, we write them in the same entry.
+With these predicates defined, we can call the fairness measure functions and check if the measure hold or not. The results are compiled in Table~\ref{tab:results}. Since some fairness measures are equivalent, we write them in the same entry.
 
 \begin{table}[h]
     \centering
@@ -422,7 +419,7 @@ Negative Balance & 1.4 & ? \\
 \end{table}
 
 \subsection{Fairness Analysis of African-American group}
-On first blush, it is curious that it satisfies disparate impact but not demographic parity. However, if we return to the definition, we'd see that disparate impact is meant to be used when being marked positive is an advantaged thing, while here in the COMPAS exmaple, being marked positive is a disadvantaged thing. Thus, henceforth we will exclude disparate impact from our analysis.
+On first blush, it is curious that it satisfies disparate impact but not demographic parity. However, if we return to the definition, we'd see that disparate impact is meant to be used when being marked positive is an advantaged thing, while here in the COMPAS example, being marked positive is a disadvantaged thing. Thus, henceforth we will exclude disparate impact from our analysis.
 
 We can then immediately tell from the failing demographic parity, mean difference, and conditional statistical parity that COMPAS prediction results was unfair against African-American, even if we only consider the ones with prior crimes.
 
@@ -437,7 +434,7 @@ Finally, if we look at positive and negative balance, we can see that they're of
 \subsection{Fairness Analysis of Different Races}
 Setting the privilege predicate to different races we can have a more comprehensive look over the dataset. We've checked the case of privilege predicate being Non-African-American, Non-Asian, Non-Caucasian, Non-Hispanic, and Non-Native American. The results are shown in Figure~\ref{fig:compas}.
 
-From the results we can first notice that the overall accuracy eqaulity is low for both the Non-Asian and Non-Native American case. This can be explained by checking the original dataset which shows that there are only 32 and 18 rows, respectivly, in dataset of 7214 rows. Hence, the accuracy is naturally lower because of the small data size.
+From the results we can first notice that the overall accuracy eqaulity is low for both the Non-Asian and Non-Native American case. This can be explained by checking the original dataset which shows that there are only 32 and 18 rows, respectively, in dataset of 7214 rows. Hence, the accuracy is naturally lower because of the small data size.
 
 Looking at the remaining three groups, Non-African-American, Non-Caucasian, and Non-Hispanic, their accuracy are relatively much better.
 
@@ -452,7 +449,14 @@ We can see that, interestingly, the group of age ``25 - 45'' group receives gene
 
 If we look closer we can see that in the age group ``Less than 25'', its predictive equality is noticeably worse, meaning in young people false positive rate is higher than older people; conversely, when we look at the age group ``Greater than 45'', both equal opportunity and predictive equality are worse, meaning for old people their treatment is even more unfair than young people. Only the middle age group is treated fairly.
 
-In another vein, the case of ``Male'' group and ``Misdemeanor'' group are both treated rather fairly. Furthermore, their overeal accuracy equality are both extremely good at the $< 0.1$ range. The predictive equality  of ``Male'' group even has a measure as low as $0.000004$.
+In another vein, the case of ``Male'' group and ``Misdemeanor'' group are both treated rather fairly. Furthermore, their overall accuracy equality are both excellent at the $< 0.1$ range. The predictive equality  of ``Male'' group even has a measure as low as $0.000004$.
+
+\subsection{Analysis with Model-as-input}
+Although this dataset scenario falls in the CSV-as-input case in our framework, we also trained a simple makeshift model using the dataset itself for demonstration.
+
+The model was trained by splitting the original dataset into 3 partitions: 60\% of the data was used for training; 20\% was used for validation; and the rest 20\% was used for calculating fairness measures. Validation showed that the accuracy was about 60\%.
+
+We only chose equalized odds of the case where privileged group is Non-African-American for illustrative purposes. The equalized odds of our model is 0.35 and 0.46, while that of COMPAS dataset is 0.23 and 0.22. So, our simple naive model is more unfair than COMPAS's model and could use some more fine-tuning.
 
 \section{Conclusion}
 Addressing the challenges brought upon by the rapid advancements in AI technologies and its introduced bias necessitates a rigorous assessment of AI system fairness. While fairness is subjective and, it can be defined through various statistical measures. Our research contributes to this effort by proposing a comprehensive framework for auditing AI systems using multiple white-box fairness metrics, such as demographic parity, equalized odds, and overall accuracy equality.
