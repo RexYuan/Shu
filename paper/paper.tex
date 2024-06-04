@@ -112,7 +112,9 @@ For the following definition we will use $Y$ to denote the ground truth of an ou
 
 \emph{Protected attributes} are the characteristics of individuals that are, for example, legally or ethically, considered sensitive and warrant protection against discrimination and bias. We denote by $S$ some protected attribute. We write $S = 1$ to represent the \emph{privileged group} and $S \neq 1$ to represent the \emph{unprivileged group}. For example, let $S$ be Caucasian. Then $S = 1$ represents the case of an individual's race being Caucasian and $S \neq 1$ vice versa.
 
-We denote by $\epsilon$ some threshold that's used to limit the fairness measures.
+We denote by $\epsilon$ some threshold that is used to limit the fairness measures.
+
+%TODO: explain various measures have different origins. for presentation we assume Y=1 to be detrimental. use comaps as example and the intuition is Y=1 => reoffend; but if the case is school or loan the tuition is reversed
 
 \subsection{Disparate Impact}
 In 1971 \cite{griggs1971}, the US spreme court ruled that it is illegal for hiring decisions to have  ``disparate impact'' by race, thus coining the term. It is taken as unintentional discrimination, as opposed to intentional discrimination, which is called ``disparate treatment''.
@@ -143,6 +145,7 @@ Overall accuracy eqaulity \cite{berk2021fairness} is similar to demographic pari
 \]
 
 \subsection{Mean Difference}
+%TODO: rewrite, move compas example to positive balance
 Mean difference \cite{vzliobaite2017measuring} considers the case of non-binary outcome, such as the score of COMPAS. It takes the expected value of the prediction. Formally, it is:
 \[
     \abs{E[\hat{Y}|S = 1] - E[\hat{Y}|S \neq 1]} \leq \epsilon
@@ -156,6 +159,7 @@ Equalized odds \cite{hardt2016equality} is similar to demogrphic parity, but it 
 \end{align*}
 
 \subsection{Equal Opportunity}
+%TODO: rewrite use footnote to explain name origin
 Equal opportunity \cite{hardt2016equality} is a relaxation of equalized odds by only considering the true positive case. It is named so because when outcome being positive is beneficial to the individual, as it is an opportunity, such as school acceptance, the fairness of the true positive case is much more important. Formally, it is:
 \begin{align*}
     \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} & \leq \epsilon
@@ -176,6 +180,7 @@ Conditional use accuracy equality \cite{berk2021fairness} is similar to equalize
 \end{align*}
 
 \subsection{Predictive Parity}
+%TODO: rewrite, set positive = detrimental to all cases
 Predictive parity \cite{chouldechova2017fair} is a relaxation of conditional use accuracy equality by only considering the positive predictive value case. Like predictive equality, it was formulated by considering positive outcome being detrimental to the individual. Thus, only the positive predictive value case is taken. Formally, it is:
 \begin{align*}
     \abs{P[Y = 1 | S = 1, \hat{Y} = 1] - P[Y = 1 | S \neq 1, \hat{Y} = 1]} \leq \epsilon
@@ -342,8 +347,9 @@ Correctional Offender Management Profiling for Alternative Sanctions (COMPAS), d
 
 ProPublica is an American non-profit journalism organization focused on public interests. In 2016, they conduct an investigative report into the COMPAS system. They obtained the 2013-2014 COMPAS score data of over 10,000 defendants in Florida. They also obtained criminal records of these defendants through 2016 and compared if they actually recidivate or not. They only counted misdemeanors and felonies as recidivism but not less serious crimes such as infractions. In the study, they've found that black defendants are disproportionately scored higher than they actually are and white defendants are disproportionately scored lower than they actually are.
 
-We shall start applying our framework. There's generally no formal guide on how to set $\epsilon$, so we will take the 80\% rule's case and set it as $\epsilon = 0.2$. For the $\epsilon$ of positive and negative balance, we shall use $\epsilon = 5$ as it is a reasonable choice.
+We shall start applying our framework. There is generally no formal guide on how to set $\epsilon$, so we will take the 80\% rule's case and set it as $\epsilon = 0.2$. For the $\epsilon$ of positive and negative balance, we shall use $\epsilon = 5$ as it is a reasonable choice.
 
+%TODO: move this to the back and choose one measure to comapre with compas
 Although this dataset scenario falls in the csv-as-input case in our framework, and thus the model $\model$ input isn't needed, we also trained two simple makeshift models using the dataset itself for demonstration that simply outputs binary $\mathtt{bool}$ prediction, ``will recidivate'' and ``will not recidivate'', and $\mathtt{int}$ risk score, $1$ to $10$. The model was trained by splitting the original dataset into 3 partitions: 60\% of the data was used for training; 20\% was used for validation; and the rest 20\% was used for calculating fairness measures. The accuracy of the binary model was about 60\% and the accuracy of the score model was about 25\%.
 
 We will set the privileged predicate be to ``non-African-American'' so that the unprivileged group will be African-American to test if the African-American race is discriminated.
@@ -365,6 +371,8 @@ For the ground truth predicate, the recidivism data is already present in the Pr
 \[
     \tru(r_i) := r_i(\text{``two\_year\_recid''}) == \text{``1''}
 \]
+
+%TODO: for score predicate
 
 For the legitimate predicate, we may want to look at defendants with priors. Here we shall set $args = (0)$.
 \[
