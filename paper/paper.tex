@@ -75,7 +75,7 @@ email address or ORCID}
 \maketitle
 
 \begin{abstract}
-With the rapid advancement of AI, there is a growing trend to integrate AI into decision-making processes. However, AI systems may exhibit biases that lead decision makers to draw unfair conclusions. Notably, the COMPAS system used in the American justice system to evaluate recidivism was found to favor racial majority groups; specifically, it violates a fairness standard called equalized odds. Various measures have been proposed to assess AI fairness. We present a framework for auditing AI fairness, involving third-party auditors and AI system provider, and we have created a tool to facilitate systematic examination of AI systems. Inclusion of independent and trusted auditors is pivotal for objectivity and accountability; third parties are often further necessary for their specialized expertise in relevant domains. Auditors, equipped with our tool, can thoroughly review AI systems for bias and fairness violations. The tool is open-sourced and publicly available. Unlike traditional AI systems, we advocate a transparent white-box and statistics-based approach. It can be utilized by third party auditors, AI developers, or the general public for reference when judging the fairness criterion of AI systems.
+With the rapid advancement of AI, there is a growing trend to integrate AI into decision-making processes. However, AI systems may exhibit biases that lead decision-makers to draw unfair conclusions. Notably, the COMPAS system used in the American justice system to evaluate recidivism was found to favor racial majority groups; specifically, it violates a fairness standard called equalized odds. Various measures have been proposed to assess AI fairness. We present a framework for auditing AI fairness, involving third-party auditors and AI system providers, and we have created a tool to facilitate systematic examination of AI systems. Including independent and trusted auditors is pivotal for objectivity and accountability; third parties are often further necessary for their specialized expertise in relevant domains. Auditors, equipped with our tool, can thoroughly review AI systems for bias and fairness violations. The tool is open-sourced and publicly available. Unlike traditional AI systems, we advocate a transparent white-box and statistics-based approach. It can be utilized by third-party auditors, AI developers, or the general public for reference when judging the fairness criterion of AI systems.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -83,32 +83,32 @@ AI, fairness, auditing
 \end{IEEEkeywords}
 
 \section{Introduction}
-In recent years, the accelerating pace of artificial intelligence (AI) technologies have revolutionized numerous fields. In healthcare, AI-driven diagnostic systems streamline disease identification, while in finance, automated trading algorithms analyze market trends to execute optimal trades swiftly. This remarkable progress has reached diverse industries, sprouting out various applications for different purposes.
+The accelerating pace of artificial intelligence (AI) technologies has revolutionized numerous fields in recent years. In healthcare, AI-driven diagnostic systems streamline disease identification, while in finance, automated trading algorithms analyze market trends to execute optimal trades swiftly. This remarkable progress has reached diverse industries, sprouting out various applications for different purposes.
 
-One of its most profound impact is how AI has transformed decision-making processes across sectors. By harnessing vast amounts of data and employing advanced algorithms, AI empowers organizations to make more informed and strategic decisions. From assessing job applicants to determining school admissions, AI-driven insights offer efficient and analytical advantages.
+One of its most profound impacts is how AI has transformed decision-making processes across sectors. By harnessing vast amounts of data and employing advanced algorithms, AI empowers organizations to make more informed and strategic decisions. From assessing job applicants to determining school admissions, AI-driven insights offer efficient and analytical advantages.
 
-AI system, however, may be biased. Factors such as inherent biases in original data sets or flaws in algorithm designs could contribute to bias within AI systems. When left unchecked, the ramifications of such biases extend far beyond mere inaccuracies; it can lead to devastating consequences, such as amplifying systemic injustices, perpetuating group discrimination, and exacerbating societal inequalities.
+AI system, however, may be biased. Factors such as inherent biases in original data sets or flaws in algorithm designs could contribute to bias within AI systems. When left unchecked, the ramifications of such biases extend far beyond mere inaccuracies; they can lead to devastating consequences, such as amplifying systemic injustices, perpetuating group discrimination, and exacerbating societal inequalities.
 
 Correctional Offender Management Profiling for Alternative Sanctions (COMPAS) is a tool for predicting recidivism---the tendency of criminals to reoffend. It is used in the criminal justice system in multiple states in the United States. In 2016, it was discovered in an investigation by the journalists at ProPublica that the COMPAS system is, in fact, unfair towards minority and disadvantaged groups.
 
-Cases such as COMPAS underscore the critical importance of rigorously examining the fairness of AI systems by third parties. Fairness is fundamentally a subjective social construct, heavily influenced by cultural context and deeply rooted in historical inequalities. However, there have been development in research leveraging statistical metrics to quantify fairness that provide transparent and objective insights.
+Cases such as COMPAS underscore the critical importance of rigorously examining the fairness of AI systems by third parties. Fairness is fundamentally a subjective social construct, heavily influenced by cultural context and deeply rooted in historical inequalities. However, there have been developments in research leveraging statistical metrics to quantify fairness that provide transparent and objective insights.
 
-By employing such mathematically rigorous methodologies, our research can offer a deeper look into the fairness of AI systems, enabling third parties to make more informed and robust judgment. For example, it would reveal that the COMPAS system violates a fairness measure called equalized odds.
+By employing such mathematically rigorous methodologies, our research can offer a deeper look into the fairness of AI systems, enabling third parties to make more informed and robust judgments. For example, it would reveal that the COMPAS system violates a fairness measure called equalized odds.
 
 In addition to equalized odds, there are a number of fairness measures for AI systems. Our framework aims to help third parties apply these metrics and navigate complex datasets with ease, pinpointing instances of bias and discrimination.
 
-With our tool, a third party such as ProPublica could clearly and easily demonstrates that COMPAS violates equalized odds according to their datasets. Our platform empowers organizations to conduct thorough assessments of AI fairness and uncover discrepancies in predictive models.
+With our tool, a third party such as ProPublica could clearly and easily demonstrate that COMPAS violates equalized odds according to their datasets. Our platform empowers organizations to conduct thorough assessments of AI fairness and uncover discrepancies in predictive models.
 
 This functionality not only facilitates sound judgment but also fosters objectivity and transparency regarding AI systems, ultimately bolster the claim of fairness and justice in AI-enabled decision-making.
 
-Our tool is written in Python and is offered as a Python package. It supports common datasets format such as CSV. It is open-sourced and publicly available for downloads.
+Our tool is written in Python and is offered as a Python package. It supports common dataset formats such as CSV. It is open-sourced and publicly available for downloads.
 
 \section{Fairness Measures}
 \label{sec:measures}
 Fairness is about making sure the disadvantaged and unprivileged groups of individuals are treated equitably. However, there have been several interpretations of it proposed in the past. To have a constructive discussion on fairness, we must first have precise definitions of it. Pessach and Shmueli \cite{pessach2022review} formulated a number of fairness measures in a unified mathematical notation. We will base our framework on their formulation.
 
 \subsection{Preliminaries}
-For the following definition we will use $Y$ to denote the ground truth of an outcome; $\hat{Y}$ to denote the predicated result of an outcome; $Y = 1$ and $\hat{Y} = 1$ to denote them being accepted or positive. For example, let $Y$ be recidivism. Then $Y = 1$ means the case of an individual actually recidivating and $\hat{Y} = 0$ means the predication of an individual recidivating is negative. In addition, we use $V$ and $\hat{V}$ when the truth and the prediction isn't binary. For example, we denote COMPAS score by $\hat{V}$, which ranges from 1 to 10.
+For the following definition, we will use $Y$ to denote the ground truth of an outcome; $\hat{Y}$ to denote the predicated result of an outcome; $Y = 1$ and $\hat{Y} = 1$ to denote them being accepted or positive. For example, let $Y$ be recidivism. Then $Y = 1$ means the case of an individual actually recidivating and $\hat{Y} = 0$ means the prediction of an individual recidivating is negative. In addition, we use $V$ and $\hat{V}$ when the truth and the prediction aren't binary. For example, we denote the COMPAS score by $\hat{V}$, which ranges from 1 to 10.
 
 \emph{Protected attributes} are the characteristics of individuals that are, for example, legally or ethically, considered sensitive and warrant protection against discrimination and bias. We denote by $S$ some protected attribute. We write $S = 1$ to represent the \emph{privileged group} and $S \neq 1$ to represent the \emph{unprivileged group}. For example, let $S$ be Caucasian. Then $S = 1$ represents the case of an individual's race being Caucasian and $S \neq 1$ vice versa.
 
@@ -119,14 +119,14 @@ A positive outcome or prediction may be either beneficial or detrimental to the 
 \subsection{Disparate Impact}
 In 1971 \cite{griggs1971}, the US Supreme Court ruled that it is illegal for hiring decisions to have  ``disparate impact'' by race, thus coining the term. It is taken as unintentional discrimination, as opposed to intentional discrimination, which is called ``disparate treatment''.
 
-Legal cases involving disparate impact often refer to the ``80\% Rule'', advocated by the US Equal Employment Opportunity Commission \cite{eeoc1979}, where it requires the selection rate of a minority group is to be no less than 80\% of that of a majority group. Formally \cite{feldman2015certifying}, it is:
+Legal cases involving disparate impact often refer to the ``80\% Rule'', advocated by the US Equal Employment Opportunity Commission \cite{eeoc1979}, where it requires the selection rate of a minority group to be no less than 80\% of that of a majority group. Formally \cite{feldman2015certifying}, it is:
 \[
     \frac{P[\hat{Y} = 1 | S \neq 1]}{P[\hat{Y} = 1 | S = 1]} \geq 1 - \epsilon
 \]
 In the case of 80\% rule, $\epsilon = 20\%$.
 
 \subsection{Demographic Parity} %TODO: why cite this?
-Demographic parity \cite{calders2010three}, also known as statistical parity, is similar to disparate impact but, instead of ratio, difference is taken. It is named so to suggest that each demographic group(such as race, gender, or age) should have equal representation or opportunity. Formally, it is:
+Demographic parity \cite{calders2010three}, also known as statistical parity, is similar to disparate impact but, instead of ratio, the difference is taken. It is named so to suggest that each demographic group(such as race, gender, or age) should have equal representation or opportunity. Formally, it is:
 \[
     \abs{P[\hat{Y} = 1 | S = 1] - P[\hat{Y} = 1 | S \neq 1]} \leq \epsilon
 \]
@@ -151,7 +151,7 @@ Mean difference \cite{vzliobaite2017measuring} considers the expected value of t
 \]
 
 \subsection{Equalized Odds}
-Equalized odds \cite{hardt2016equality} is similar to demographic parity, but it further takes into account the ground truth. It considers the cases of true positive and false positive. It solves the downsides of a fully accurate classifier might be deemed unfair by measures that don't take ground truth into consideration. For example, consider a group $A$ that is predicated to recidivate and they do in fact recidivate and a group $B$ that is predicated to recidivate but end up never recidivating. A fully accurate classifier will always predict $A$ to recidivate while $B$ to never recidivate, and this will violate demographic parity. By taking ground truth into account, equalized odds avoids these pitfalls. Formally, it is:
+Equalized odds \cite{hardt2016equality} is similar to demographic parity, but it further takes into account the ground truth. It considers the cases of true positive and false positive. It solves the downsides of a fully accurate classifier that might be deemed unfair by measures that do not consider ground truth. For example, consider a group $A$ that is predicated to recidivate and they do in fact recidivate and a group $B$ that is predicated to recidivate but end up never recidivating. A fully accurate classifier will always predict $A$ to recidivate while $B$ to never recidivate, and this will violate demographic parity. By taking ground truth into account, equalized odds avoids these pitfalls. Formally, it is:
 \begin{align*}
     \abs{P[\hat{Y} = 1 | S = 1, Y = 0] - P[\hat{Y} = 1 | S \neq 1, Y = 0]} & \leq \epsilon \\
     \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} & \leq \epsilon
@@ -170,7 +170,7 @@ Predictive equality \cite{corbett2017algorithmic} is also a relaxation of equali
 \end{align*}
 
 \subsection{Conditional Use Accuracy Equality}
-Conditional use accuracy equality \cite{berk2021fairness} is similar to equalized odds, but instead of conditioning on the ground truth, it conditions on the prediction and calculated the probability of the ground truth. It can be seen as checking the prediction accuracy across groups, thus the name. It further requires the measure on the case of positive predictive values is less than that of the negative predictive values. Formally, it is:
+Conditional use accuracy equality \cite{berk2021fairness} is similar to equalized odds, but instead of conditioning on the ground truth, it conditions on the prediction and calculates the probability of the ground truth. It can be seen as checking the prediction accuracy across groups, thus the name. It further requires the measure in the case of positive predictive values to be less than that of the negative predictive values. Formally, it is:
 \begin{align*}
     \abs{P[Y = 1 | S = 1, \hat{Y} = 1] & - P[Y = 1 | S \neq 1, \hat{Y} = 1]} && \leq \epsilon \\
     & \rotatebox{90}{>} && \\
@@ -184,7 +184,7 @@ Predictive parity \cite{chouldechova2017fair} is a relaxation of conditional use
 \end{align*}
 
 \subsection{Equal Calibration}
-Equal calibration \cite{chouldechova2017fair} is similar to equal opportunity, but instead of having a binary $\hat{Y}$, it is conditioned on the range of the predicted value $\hat{V}$. For example, this could be conditioned on the highest COMPAS score $\hat{V} = 10$. Calibration is a concept of having fair score function \cite{fraenkel2020fairness}. Formally, it is:
+Equal calibration \cite{chouldechova2017fair} is similar to equal opportunity, but instead of having a binary $\hat{Y}$, it is conditioned on the range of the predicted value $\hat{V}$. For example, this could be conditioned on the highest COMPAS score $\hat{V} = 10$. Calibration is a concept of having a fair score function \cite{fraenkel2020fairness}. Formally, it is:
 \begin{align*}
     \abs{P[Y = 1 | S = 1, \hat{V} = v] - P[Y = 1 | S \neq 1, \hat{V} = v]} \leq \epsilon
 \end{align*}
@@ -249,7 +249,7 @@ Negative Balance & $\abs{E[\hat{V} | Y = 0, S = 1] - E[\hat{V} | Y = 0, S \neq 1
 
 \section{Auditing Framework}
 \label{sec:framework}
-Per the review by Pessach and Shmueli \cite{pessach2022review}, we designed an auditing framework for calculating the various fairness measure. We offer two versions of fairness checkers: one for when the prediction positive results are readily available in CSV input and one for when a model is provided. In most auditing cases the model version is preferred because CSV result can be easily fabricated.
+Per the review by Pessach and Shmueli \cite{pessach2022review}, we designed an auditing framework for calculating the various fairness measures. We offer two versions of fairness checkers: one for when the prediction results are readily available in CSV input and one for when a model is provided. In most auditing cases the model version is preferred because CSV results can be easily fabricated.
 
 \subsection{Notations}
 Types $\alpha,\beta$ are stand-ins for any type. Let $\alpha \implies \beta$ denote a function from type $\alpha$ to type $\beta$. $\alpha_i$ denotes some particular type; $\prod_i \alpha_i$ denotes the Cartesian product of multiple $\alpha$ of possibly different types. We write $x : \alpha$ to mean $x$ is of the type $\alpha$. We write $\mathtt{str}$ for the string type, $\mathtt{bool}$ for the boolean type, and $\mathtt{int}$ for the integer type.
@@ -271,7 +271,7 @@ A \emph{legitimate predicate} $\leg : \prod_i \alpha_i \implies \mathtt{row} \im
 A \emph{calibration predicate} $\calib : \prod_i \alpha_i \implies \mathtt{row} \implies \mathtt{bool}$, takes $n$ parameters and returns a row predicate. For example, $\calib(u, l)(r_i) := l < \mathtt{int}(r_i(\text{``score''})) < u$ first takes two parameters $u,l$ as upper bound and lower bound, and then decides if $r_i$'s prediction score is between them.
 
 \subsection{Definitions}
-We abstracted the idea of privileged groups and positive prediction as predicates to maximize flexibility. With the proper predicates, any model output can be used; even prose-like response of generative models can be included given adequate predicates.
+We abstracted the idea of privileged groups and positive prediction as predicates to maximize flexibility. With the proper predicates, any model output can be used; even prose-like responses of generative models can be included given adequate predicates.
 
 Given a dataset $\db$ for auditing use, and given CSV prediction results or the prediction model $\model$ itself, we can calculate the fairness measures by modeling the statistical random variables mentioned in Section~\ref{sec:measures} with our predicates. We demonstrate this process in the following for a few selected measures; all the other measures can be modeled similarly.
 
@@ -311,7 +311,7 @@ $\hat{Y}$ and $S$ are modeled as above. As for $L = l$, we abstracted it similar
     \text{conditional\_statistical\_parity} (\epsilon, \model, \priv, \pos, \leg, (args, ...))
 \end{align*}
 
-This way, we can calculate each conditions programmatically by testing if the predicate is true on all rows and obtain the resulting measure. All the measures can be modeled in a similar vein. So, in total, we have:
+This way, we can calculate each condition programmatically by testing if the predicate is true on all rows and obtain the resulting measure. All the measures can be modeled in a similar vein. So, in total, we have:
 
 \begin{align*}
 \text{disparate\_impact} & (\epsilon, \model, \priv, \pos) \\
@@ -340,9 +340,9 @@ We implemented the framework in Python, and it is available as a public domain o
 \label{sec:app}
 In this section, we will apply the proposed framework to the ProPublica COMPAS dataset \cite{angwin2016machine,larson2016compas,larson2016propublica}.
 
-Correctional Offender Management Profiling for Alternative Sanctions (COMPAS), developed by private company Northpointe (now Equivant), is a risk assessment software used in the American criminal justice system to evaluate the likelihood of a defendant reoffending. Defendants taking the COMPAS test are given a questionnaire about topics ranging from family history to personal ideology. The questionnaire is then fed to the software system along with a number of parameters like the defendants' age, and then the system will assign a risk score to them from 1-10, with 10 being the highest risk.
+Correctional Offender Management Profiling for Alternative Sanctions (COMPAS), developed by the private company Northpointe (now Equivant), is a risk assessment software used in the American criminal justice system to evaluate the likelihood of a defendant reoffending. Defendants taking the COMPAS test are given a questionnaire about topics ranging from family history to personal ideology. The questionnaire is then fed to the software system along with a number of parameters like the defendants' age, and then the system will assign a risk score to them from 1-10, with 10 being the highest risk.
 
-ProPublica is an American non-profit journalism organization focused on public interests. In 2016, they conduct an investigative report into the COMPAS system. They obtained the 2013-2014 COMPAS score data of over 10,000 defendants in Florida. They also obtained criminal records of these defendants through 2016 and compared if they actually recidivate or not. They only counted misdemeanors and felonies as recidivism but not less serious crimes such as infractions. In the study, they've found that black defendants are disproportionately scored higher than they actually are, and white defendants are disproportionately scored lower than they actually are.
+ProPublica is an American non-profit journalism organization focused on public interests. In 2016, they conducted an investigative report into the COMPAS system. They obtained the 2013-2014 COMPAS score data of over 10,000 defendants in Florida. They also obtained criminal records of these defendants through 2016 and compared if they actually recidivate or not. They only counted misdemeanors and felonies as recidivism but not less serious crimes such as infractions. In the study, they've found that black defendants are disproportionately scored higher than they actually are, and white defendants are disproportionately scored lower than they actually are.
 
 We shall start applying our framework. There is generally no formal guide on how to set $\epsilon$, so we will take the 80\% rule's case and set it as $\epsilon = 0.2$. For the $\epsilon$ of positive and negative balance, we shall use $\epsilon = 5$ as it is a reasonable choice.
 
@@ -376,12 +376,12 @@ For the legitimate predicate, we may want to look at defendants with priors. Her
     \leg(0)(r_i) := \mathtt{int}(r_i(\text{``priors\_count''})) > 0
 \]
 
-For the calibration predicate, we may want to look at risk scores between a specific range. Here we shall set $args = (7,5)$.
+For the calibration predicate, we may want to look at risk scores within a specific range. Here we shall set $args = (7,5)$.
 \[
     \calib(7,5)(r_i) := 5 \leq \mathtt{int}(r_i(\text{``decile\_score''})) \leq 7
 \]
 
-With these predicates defined, we can call the fairness measure functions and check if the measure hold or not. The results are compiled in Table~\ref{tab:results}. Since some fairness measures are equivalent, we write them in the same entry.
+With these predicates defined, we can call the fairness measure functions and check if the measures hold or not. The results are compiled in Table~\ref{tab:results}. Since some fairness measures are equivalent, we write them in the same entry.
 
 \begin{table}[h]
     \centering
@@ -421,9 +421,9 @@ Negative Balance & 1.4 & ? \\
 \subsection{Fairness Analysis of African-American group}
 On first blush, it is curious that it satisfies disparate impact but not demographic parity. However, if we return to the definition, we'd see that disparate impact is meant to be used when being marked positive is an advantaged thing, while here in the COMPAS example, being marked positive is a disadvantaged thing. Thus, henceforth we will exclude disparate impact from our analysis.
 
-We can then immediately tell from the failing demographic parity, mean difference, and conditional statistical parity that COMPAS prediction results was unfair against African-American, even if we only consider the ones with prior crimes.
+We can then immediately tell from the failing demographic parity, mean difference, and conditional statistical parity that COMPAS prediction results were unfair against African-American, even if we only consider the ones with prior crimes.
 
-From the low overall accuracy equality and both conditional use accuracy equality criteria we can tell that the accuracy is similar across African-Americans and non-African-Americans.
+From the low overall accuracy equality and both conditional use accuracy equality criteria, we can tell that the accuracy is similar across African-Americans and non-African-Americans.
 
 From the failing equalized odds we can conclude that African-Americans are indeed treated unequally by the COMPAS system even after the ground truth is taken into account. This is the same conclusion reached by the ProPublica report.
 
@@ -432,11 +432,11 @@ From the low equal calibration we can tell that if we only consider the medium r
 Finally, if we look at positive and negative balance, we can see that they're of similar numbers. Their average is 1.5 on a scale of 10, which means approximately a 15\% difference. It remains to be said if this is fair or not. An auditor could consult a domain expert for advice on how to set a $\epsilon$ and how it is justified.
 
 \subsection{Fairness Analysis of Different Races}
-Setting the privilege predicate to different races we can have a more comprehensive look over the dataset. We've checked the case of privilege predicate being Non-African-American, Non-Asian, Non-Caucasian, Non-Hispanic, and Non-Native American. The results are shown in Figure~\ref{fig:compas}.
+By setting the privilege predicate to different races we can have a more comprehensive look over the dataset. We've checked the case of privilege predicate being Non-African-American, Non-Asian, Non-Caucasian, Non-Hispanic, and Non-Native American. The results are shown in Figure~\ref{fig:compas}.
 
-From the results we can first notice that the overall accuracy eqaulity is low for both the Non-Asian and Non-Native American case. This can be explained by checking the original dataset which shows that there are only 32 and 18 rows, respectively, in dataset of 7214 rows. Hence, the accuracy is naturally lower because of the small data size.
+From the results, we can first notice that the overall accuracy equality is low for both the Non-Asian and Non-Native American cases. This can be explained by checking the original dataset which shows that there are only 32 and 18 rows, respectively, in a dataset of 7214 rows. Hence, the accuracy is naturally lower because of the small data size.
 
-Looking at the remaining three groups, Non-African-American, Non-Caucasian, and Non-Hispanic, their accuracy are relatively much better.
+Looking at the remaining three groups, Non-African-American, Non-Caucasian, and Non-Hispanic, their accuracies are relatively much better.
 
 As for fairness measures, we can immediately see from that all measures are $\epsilon < 0.2$ for Non-Caucasian and Non-Hispanic that African-American are indeed treated unfairly in a broad sense.
 
@@ -447,7 +447,7 @@ On the other hand, we also analyzed the case of unprivileged group being across 
 
 We can see that, interestingly, the group of age ``25 - 45'' group receives generally fair treatment. Its data size is also the largest at 4109 rows, whereas ``Less than 25'' age group has 1529 rows and ``Greater than 45'' age group has 1576 rows, so the possibility of skewed data is unlikely.
 
-If we look closer we can see that in the age group ``Less than 25'', its predictive equality is noticeably worse, meaning in young people false positive rate is higher than older people; conversely, when we look at the age group ``Greater than 45'', both equal opportunity and predictive equality are worse, meaning for old people their treatment is even more unfair than young people. Only the middle age group is treated fairly.
+If we look closer we can see that in the age group ``Less than 25'', its predictive equality is noticeably worse, meaning in young people false positive rate is higher than in older people; conversely, when we look at the age group ``Greater than 45'', both equal opportunity and predictive equality are worse, meaning for old people their treatment is even more unfair than young people. Only the middle age group is treated fairly.
 
 In another vein, the case of ``Male'' group and ``Misdemeanor'' group are both treated rather fairly. Furthermore, their overall accuracy equality are both excellent at the $< 0.1$ range. The predictive equality  of ``Male'' group even has a measure as low as $0.000004$.
 
@@ -456,10 +456,10 @@ Although this dataset scenario falls in the CSV-as-input case in our framework, 
 
 The model was trained by splitting the original dataset into 3 partitions: 60\% of the data was used for training; 20\% was used for validation; and the rest 20\% was used for calculating fairness measures. Validation showed that the accuracy was about 60\%.
 
-We only chose equalized odds of the case where privileged group is Non-African-American for illustrative purposes. The equalized odds of our model is 0.35 and 0.46, while that of COMPAS dataset is 0.23 and 0.22. So, our simple naive model is more unfair than COMPAS's model and could use some more fine-tuning.
+We only chose equalized odds of the case where privileged group is Non-African-American for illustrative purposes. The equalized odds of our model is 0.35 and 0.46, while that of the COMPAS dataset is 0.23 and 0.22. So, our simple naive model is more unfair than COMPAS's model and could use some more fine-tuning.
 
 \section{Conclusion}
-Addressing the challenges brought upon by the rapid advancements in AI technologies and its introduced bias necessitates a rigorous assessment of AI system fairness. While fairness is subjective and, it can be defined through various statistical measures. Our research contributes to this effort by proposing a comprehensive framework for auditing AI systems using multiple white-box fairness metrics, such as demographic parity, equalized odds, and overall accuracy equality.
+Addressing the challenges brought upon by the rapid advancements in AI technologies and its introduced bias necessitates a rigorous assessment of AI system fairness. While fairness is subjective, it can be defined through various statistical measures. Our research contributes to this effort by proposing a comprehensive framework for auditing AI systems using multiple white-box fairness metrics, such as demographic parity, equalized odds, and overall accuracy equality.
 
 By applying this framework to the COMPAS dataset, we confirmed that African-American defendants were unfairly scored compared to other racial groups. These results align with ProPublica's findings, demonstrating the utility and accuracy of our fairness auditing tool. Developed in Python and publicly available, this tool enables third parties to conduct detailed assessments of AI systems, promoting transparency and accountability.
 
