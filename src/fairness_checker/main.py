@@ -10,11 +10,12 @@ T = TypeVar('T')
 
 def print_stats(title, measure, ratio):
     print(title)
+    fair_string = "fair" if measure < ratio else "unfair"
     if measure >= 0.01:
-        print('fair: {0:.2f} < {1}'.format(measure, ratio))
+        print(f"{fair_string}: {measure:.2f} < {ratio}")
     else:
         precision = math.ceil(-math.log10(abs(measure) - abs(math.floor(measure))))
-        print('fair: {0:.{1}f} < {2}'.format(measure, precision, ratio))
+        print(f"{fair_string}: {measure:.{precision}f} < {ratio}")
 
 class fairness_model_checker:
     def __init__(self, raw_file: str):
