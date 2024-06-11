@@ -52,9 +52,11 @@ email address or ORCID}
 \newcommand{\model}{\mathcal{M}}
 \newcommand{\priv}{R}
 \newcommand{\pos}{\hat{P}}
+\newcommand{\posm}{\hat{P}_\mathcal{M}}
 \newcommand{\tru}{T}
 \newcommand{\leg}{L}
 \newcommand{\sco}{\hat{S}}
+\newcommand{\scom}{\hat{S}_\mathcal{M}}
 \newcommand{\calib}{C}
 
 \newcommand{\bye}[1]{}
@@ -75,7 +77,7 @@ email address or ORCID}
 \maketitle
 
 \begin{abstract}
-With the rapid advancement of AI, there is a growing trend to integrate AI into decision-making processes. However, AI systems may exhibit biases that lead decision-makers to draw unfair conclusions. Notably, the COMPAS system used in the American justice system to evaluate recidivism was found to favor racial majority groups; specifically, it violates a fairness standard called equalized odds. Various measures have been proposed to assess AI fairness. We present a framework for auditing AI fairness, involving third-party auditors and AI system providers, and we have created a tool to facilitate systematic examination of AI systems. Including independent and trusted auditors is pivotal for objectivity and accountability; third parties are often further necessary for their specialized expertise in relevant domains. Auditors, equipped with our tool, can thoroughly review AI systems for bias and fairness violations. The tool is open-sourced and publicly available. Unlike traditional AI systems, we advocate a transparent white-box and statistics-based approach. It can be utilized by third-party auditors, AI developers, or the general public for reference when judging the fairness criterion of AI systems.
+With the rapid advancement of AI, there is a growing trend to integrate AI into decision-making processes. However, AI systems may exhibit biases that lead decision-makers to draw unfair conclusions. Notably, the COMPAS system used in the American justice system to evaluate recidivism was found to favor racial majority groups; specifically, it violates a fairness standard called equalized odds. Various measures have been proposed to assess AI fairness. We present a framework for auditing AI fairness, involving third-party auditors and AI system providers, and we have created a tool to facilitate systematic examination of AI systems. The tool is open-sourced and publicly available. Unlike traditional AI systems, we advocate a transparent white-box and statistics-based approach. It can be utilized by third-party auditors, AI developers, or the general public for reference when judging the fairness criterion of AI systems.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -93,12 +95,22 @@ Correctional Offender Management Profiling for Alternative Sanctions (COMPAS) is
 
 Cases such as COMPAS underscore the critical importance of rigorously examining the fairness of AI systems by third parties. Fairness is fundamentally a subjective social construct, heavily influenced by cultural context and deeply rooted in historical inequalities. However, there have been developments in research leveraging statistical metrics to quantify fairness that provide transparent and objective insights.
 
+%TODO: clarify the og defs and the role our tools plays
+% 1 fairness measures and compas eq odds
+% 2 our framework's role and it can do these calcs "and more"
+% 3 3rd party is important and with our tool...
+% 4 transparency
 By employing such mathematically rigorous methodologies, our research can offer a deeper look into the fairness of AI systems, enabling third parties to make more informed and robust judgments. For example, it would reveal that the COMPAS system violates a fairness measure called equalized odds.
 
+%TODO: fit this in
+Including independent and trusted auditors is pivotal for objectivity and accountability; third parties are often further necessary for their specialized expertise in relevant domains. Auditors, equipped with our tool, can thoroughly review AI systems for bias and fairness violations.
+
+%TODO:: rewrite following
 In addition to equalized odds, there are a number of fairness measures for AI systems. Our framework aims to help third parties apply these metrics and navigate complex datasets with ease, pinpointing instances of bias and discrimination.
 
 With our tool, a third party such as ProPublica could clearly and easily demonstrate that COMPAS violates equalized odds according to their datasets. Our platform empowers organizations to conduct thorough assessments of AI fairness and uncover discrepancies in predictive models.
 
+%TODO: rewrite this. how is our tool transparent
 This functionality not only facilitates sound judgment but also fosters objectivity and transparency regarding AI systems, ultimately bolster the claim of fairness and justice in AI-enabled decision-making.
 
 Our tool is written in Python and is offered as a Python package. It supports common dataset formats such as CSV. It is open-sourced and publicly available for downloads.
@@ -114,8 +126,6 @@ For the following definition, we will use $Y$ to denote the ground truth of an o
 
 We denote by $\epsilon$ some threshold that is used to limit the fairness measures.
 
-A positive outcome or prediction may be either beneficial or detrimental to the individual in different cases. Various measures were devised when considering different scenarios. For presentation, we consider $Y=1$ to be the detrimental case, like in the COMPAS prediction scenarios.
-
 \subsection{Disparate Impact}
 In 1971 \cite{griggs1971}, the US Supreme Court ruled that it is illegal for hiring decisions to have  ``disparate impact'' by race, thus coining the term. It is taken as unintentional discrimination, as opposed to intentional discrimination, which is called ``disparate treatment''.
 
@@ -125,8 +135,8 @@ Legal cases involving disparate impact often refer to the ``80\% Rule'', advocat
 \]
 In the case of 80\% rule, $\epsilon = 20\%$.
 
-\subsection{Demographic Parity} %TODO: why cite this?
-Demographic parity \cite{calders2010three}, also known as statistical parity, is similar to disparate impact but, instead of ratio, the difference is taken. It is named so to suggest that each demographic group(such as race, gender, or age) should have equal representation or opportunity. Formally, it is:
+\subsection{Demographic Parity}
+Demographic parity \cite{pessach2022review}, also known as statistical parity, is similar to disparate impact but, instead of ratio, the difference is taken. It is named so to suggest that each demographic group(such as race, gender, or age) should have equal representation or opportunity. Formally, it is:
 \[
     \abs{P[\hat{Y} = 1 | S = 1] - P[\hat{Y} = 1 | S \neq 1]} \leq \epsilon
 \]
@@ -158,7 +168,7 @@ Equalized odds \cite{hardt2016equality} is similar to demographic parity, but it
 \end{align*}
 
 \subsection{Equal Opportunity}
-Equal opportunity \footnote{It was named so by considering the cases where positive outcomes benefit individuals, such as school admissions, hence the word opportunity.} \cite{hardt2016equality} is a relaxation of equalized odds by only considering the true positive case. Formally, it is:
+Equal opportunity \cite{hardt2016equality} is a relaxation of equalized odds by only considering the true positive case. Formally, it is:
 \begin{align*}
     \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} & \leq \epsilon
 \end{align*}
@@ -260,9 +270,9 @@ A \emph{model} $\model : \mathtt{row} \implies \alpha$ is a black-box predictor 
 
 A \emph{privileged predicate} $\priv : \mathtt{row} \implies \mathtt{bool}$ takes a row and determines if it belongs to the privileged group. For example, $\priv(r_i) := r_i(\text{``race''}) == \text{``Caucasian''}$ means the privileged group is those with race being Caucasian.
 
-A \emph{positive predicate} of rows $\pos : \mathtt{row} \implies \mathtt{bool}$ takes a row and determines if its prediction is positive. For example, $\pos(r_i) := \mathtt{int}(r_i(\text{``score''})) > 7$ means a row's prediction is positive if its score is greater than 7. A positive predicate of model results $\pos : \alpha \implies \mathtt{bool}$ takes a model's result and determines if it is positive. In the simplest case, the model returns a $\mathtt{bool}$, and the positive predicate can just be the identity function.
+A \emph{positive predicate} of rows $\pos : \mathtt{row} \implies \mathtt{bool}$ takes a row and determines if its prediction is positive. For example, $\pos(r_i) := \mathtt{int}(r_i(\text{``score''})) > 7$ means a row's prediction is positive if its score is greater than 7. A positive predicate of model results $\posm : \alpha \implies \mathtt{bool}$ takes a model's result and determines if it is positive. In the simplest case, the model returns a $\mathtt{bool}$, and the positive predicate can just be the identity function.
 
-A \emph{score predicate} of rows $\sco : \mathtt{row} \implies \alpha$ takes a row and gives its predicted score. Similar to positive predicate, a score predicate of model results $\sco : \alpha \implies \beta$ takes a model's result and gives its score.
+A \emph{score predicate} of rows $\sco : \mathtt{row} \implies \alpha$ takes a row and gives its predicted score. Similar to positive predicate, a score predicate of model results $\scom : \alpha \implies \beta$ takes a model's result and gives its score.
 
 A \emph{ground truth predicate} $\tru : \mathtt{row} \implies \mathtt{bool}$ takes a row and gives the ground truth of the result.
 
@@ -280,6 +290,7 @@ For equal opportunity, recall its formal definition:
     \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} \leq \epsilon
 \end{align*}
 To model the $Y$, $\hat{Y}$, and $S$, we define the corresponding $\tru$, $\pos$, and $\priv$. We have $Y = 1$ if and only if $\tru$ is true; $\hat{Y} = 1$ if and only if $\pos$ is true; $S = 1$ if and only if $\priv$ is true; and vice versa.
+%TODO: to calculate equal opp we call the function
 \begin{align*}
     \text{equal\_opportunity} (\epsilon, \model, \priv, \pos, \tru)
 \end{align*}
@@ -297,39 +308,21 @@ For equal calibration, recall its formal definition:
 \begin{align*}
     \abs{P[Y = 1 | S = 1, \hat{V} = v] - P[Y = 1 | S \neq 1, \hat{V} = v]} \leq \epsilon
 \end{align*}
-Here we model $Y$ and $S$ as above. As for $\hat{V} = v$, we abstracted $\hat{V}$ with $\calib$ and $v$ with $args$. We have $\hat{V} = v$ if and only if $\calib(args, ...)$ is true.
+Here we model $Y$ and $S$ as above. As for $\hat{V} = v$, we abstracted $\hat{V}$ with $\calib$ and $v$ with $args$. We have $\hat{V} = v$ if and only if $\calib(v, r_i)$ is true.
 \begin{align*}
-    \text{equal\_calibration} (\epsilon, \model, \priv, \calib, \tru, (args, ...))
+    \text{equal\_calibration} (\epsilon, \model, \priv, \calib, \tru, (v))
 \end{align*}
 
 For conditional statistical parity, its formal definition is:
 \[
     \abs{P[\hat{Y} = 1 | S = 1, L = l] - P[\hat{Y} = 1 | S \neq 1, L = l]} \leq \epsilon
 \]
-$\hat{Y}$ and $S$ are modeled as above. As for $L = l$, we abstracted it similarly to the case above by having $L = l$ if and only if $\leg(args, ...)$ is true.
+$\hat{Y}$ and $S$ are modeled as above. As for $L = l$, we abstracted it similarly to the case above by having $L = l$ if and only if $\leg(l)$ is true.
 \begin{align*}
-    \text{conditional\_statistical\_parity} (\epsilon, \model, \priv, \pos, \leg, (args, ...))
+    \text{conditional\_statistical\_parity} (\epsilon, \model, \priv, \pos, \leg, (l))
 \end{align*}
 
-This way, we can calculate each condition programmatically by testing if the predicate is true on all rows and obtain the resulting measure. All the measures can be modeled in a similar vein. So, in total, we have:
-
-\begin{align*}
-\text{disparate\_impact} & (\epsilon, \model, \priv, \pos) \\
-\text{demographic\_parity} & (\epsilon, \model, \priv, \pos) \\
-\text{conditional\_statistical\_parity} & (\epsilon, \model, \priv, \pos, \leg, (args, ...)) \\
-\text{overall\_accuracy\_eqaulity} & (\epsilon, \model, \priv, \pos, \tru) \\
-\text{mean\_difference} & (\epsilon, \model, \priv, \pos) \\
-\text{equalized\_odds} & (\epsilon, \model, \priv, \pos, \tru) \\
-\text{equal\_opportunity} & (\epsilon, \model, \priv, \pos, \tru) \\
-\text{predictive\_equality} & (\epsilon, \model, \priv, \pos, \tru) \\
-\text{conditional\_use\_accuracy\_equality} & (\epsilon, \model, \priv, \pos, \tru) \\
-\text{predictive\_parity} & (\epsilon, \model, \priv, \pos, \tru) \\
-\text{equal\_calibration} & (\epsilon, \model, \priv, \calib, \tru, (args, ...)) \\
-\text{positive\_balance} & (\epsilon, \model, \priv, \sco, \tru) \\
-\text{nagative\_balance} & (\epsilon, \model, \priv, \sco, \tru) \\
-\end{align*}
-
-where $\mathcal{M}$ is optional if the input contains CSV prediction results.
+This way, we can calculate each condition programmatically by testing if the predicate is true on all rows and obtain the resulting measure. All the measures can be modeled in a similar vein.
 
 By calculating all the available fairness measures, we provide the auditors a comprehensive perspective on the fairness performance of a model or dataset.
 
@@ -342,11 +335,11 @@ In this section, we will apply the proposed framework to the ProPublica COMPAS d
 
 Correctional Offender Management Profiling for Alternative Sanctions (COMPAS), developed by the private company Northpointe (now Equivant), is a risk assessment software used in the American criminal justice system to evaluate the likelihood of a defendant reoffending. Defendants taking the COMPAS test are given a questionnaire about topics ranging from family history to personal ideology. The questionnaire is then fed to the software system along with a number of parameters like the defendants' age, and then the system will assign a risk score to them from 1-10, with 10 being the highest risk.
 
-ProPublica is an American non-profit journalism organization focused on public interests. In 2016, they conducted an investigative report into the COMPAS system. They obtained the 2013-2014 COMPAS score data of over 10,000 defendants in Florida. They also obtained criminal records of these defendants through 2016 and compared if they actually recidivate or not. They only counted misdemeanors and felonies as recidivism but not less serious crimes such as infractions. In the study, they've found that black defendants are disproportionately scored higher than they actually are, and white defendants are disproportionately scored lower than they actually are.
+ProPublica is an American non-profit journalism organization focused on public interests. In 2016, they conducted an investigative report into the COMPAS system. They obtained the 2013-2014 COMPAS score data of over 10,000 defendants in Florida. They also obtained criminal records of these defendants through 2016 and compared if they actually recidivate or not. They only counted misdemeanors and felonies as recidivism but not less serious crimes such as infractions. In the study, they have found that black defendants are disproportionately scored higher than they actually are, and white defendants are disproportionately scored lower than they actually are.
 
-We shall start applying our framework. There is generally no formal guide on how to set $\epsilon$, so we will take the 80\% rule's case and set it as $\epsilon = 0.2$. For the $\epsilon$ of positive and negative balance, we shall use $\epsilon = 5$ as it is a reasonable choice.
+We shall start applying our framework. There is generally no formal guide on how to set $\epsilon$, so we will take the 80\% rule's case and set it as $\epsilon = 0.2$.
 
-We will set the privileged predicate be to ``non-African-American'' so that the unprivileged group will be African-American to test if the African-American race is discriminated.
+We will set the unprivileged predicate be to ``African-American'' so that the unprivileged group will be African-American to test if the African-American race is discriminated.
 \[
     \priv(r_i) := r_i(\text{``race''}) \neq \text{``African-American''}
 \]
@@ -355,11 +348,7 @@ As ProPublica referenced Northpointe's COMPAS Practitioners Guide and cited that
 \[
     \pos(r_i) := r_i(\text{``score\_text''}) \in \set{\text{``Medium''},\text{``High''}}
 \]
-Alternatively, since we know the corresponding scores of the categories, we can define it using the scores themselves, too.
-\[
-    \pos(r_i) := 5 \leq \mathtt{int}(r_i(\text{``decile\_score''})) \leq 10
-\]
-On the other hand, when we're taking prediction input from our makeshift model, we simply return its result because it already gives a binary $\mathtt{bool}$ result: $\pos(r_i) := \model(r_i)$
+On the other hand, when we're taking prediction input from our makeshift model, we simply return its result because it already gives a binary $\mathtt{bool}$ result: $\posm(r_i) := \model(r_i)$
 
 For the ground truth predicate, the recidivism data is already present in the ProPublica dataset, so all we have to do is a simple lookup.
 \[
@@ -371,12 +360,12 @@ For the score predicate, it is again a simple lookup.
     \sco(r_i) := \mathtt{int}(r_i(\text{``decile\_score''}))
 \]
 
-For the legitimate predicate, we may want to look at defendants with priors. Here we shall set $args = (0)$.
+For the legitimate predicate, we may want to look at defendants with priors.
 \[
     \leg(0)(r_i) := \mathtt{int}(r_i(\text{``priors\_count''})) > 0
 \]
 
-For the calibration predicate, we may want to look at risk scores within a specific range. Here we shall set $args = (7,5)$.
+For the calibration predicate, we may want to look at risk scores within a specific range.
 \[
     \calib(7,5)(r_i) := 5 \leq \mathtt{int}(r_i(\text{``decile\_score''})) \leq 7
 \]
@@ -414,12 +403,13 @@ Positive Balance & 1.6 & ? \\
 Negative Balance & 1.4 & ? \\
 \hline
     \end{tabular}
-    \caption{Fairness measures of privileged group being Non-African-American.}
+    \caption{Fairness measures of unprivileged group being African-American.}
     \label{tab:results}
 \end{table}
 
 \subsection{Fairness Analysis of African-American group}
-On first blush, it is curious that it satisfies disparate impact but not demographic parity. However, if we return to the definition, we'd see that disparate impact is meant to be used when being marked positive is an advantaged thing, while here in the COMPAS example, being marked positive is a disadvantaged thing. Thus, henceforth we will exclude disparate impact from our analysis.
+%TODO: explain why other measures still work because they're taking the difference
+On first blush, it is curious that it satisfies disparate impact but not demographic parity. However, if we return to the definition, we would see that disparate impact is meant to be used when being marked positive is an advantaged thing, while here in the COMPAS example, being marked positive is a disadvantaged thing. Thus, henceforth we will exclude disparate impact from our analysis.
 
 We can then immediately tell from the failing demographic parity, mean difference, and conditional statistical parity that COMPAS prediction results were unfair against African-American, even if we only consider the ones with prior crimes.
 
@@ -427,18 +417,18 @@ From the low overall accuracy equality and both conditional use accuracy equalit
 
 From the failing equalized odds we can conclude that African-Americans are indeed treated unequally by the COMPAS system even after the ground truth is taken into account. This is the same conclusion reached by the ProPublica report.
 
-From the low equal calibration we can tell that if we only consider the medium risk score, African-Americans aren't treated fairly.
+From the low equal calibration we can tell that if we only consider the medium risk score, African-Americans are treated fairly.
 
 Finally, if we look at positive and negative balance, we can see that they're of similar numbers. Their average is 1.5 on a scale of 10, which means approximately a 15\% difference. It remains to be said if this is fair or not. An auditor could consult a domain expert for advice on how to set a $\epsilon$ and how it is justified.
 
 \subsection{Fairness Analysis of Different Races}
-By setting the privilege predicate to different races we can have a more comprehensive look over the dataset. We've checked the case of privilege predicate being Non-African-American, Non-Asian, Non-Caucasian, Non-Hispanic, and Non-Native American. The results are shown in Figure~\ref{fig:compas}.
+By setting the privilege predicate to different races we can have a more comprehensive look over the dataset. We have checked the case of unprivilege predicate being African-American, Asian, Caucasian, Hispanic, and Native American. The results are shown in Figure~\ref{fig:compas}.
 
-From the results, we can first notice that the overall accuracy equality is low for both the Non-Asian and Non-Native American cases. This can be explained by checking the original dataset which shows that there are only 32 and 18 rows, respectively, in a dataset of 7214 rows. Hence, the accuracy is naturally lower because of the small data size.
+From the results, we can first notice that the overall accuracy equality is low for both the Asian and Native American cases. This can be explained by checking the original dataset which shows that there are only 32 and 18 rows, respectively, in a dataset of 7214 rows. Hence, the accuracy is naturally lower because of the small data size.
 
-Looking at the remaining three groups, Non-African-American, Non-Caucasian, and Non-Hispanic, their accuracies are relatively much better.
+Looking at the remaining three groups, African-American, Caucasian, and Hispanic, their accuracies are relatively much better.
 
-As for fairness measures, we can immediately see from that all measures are $\epsilon < 0.2$ for Non-Caucasian and Non-Hispanic that African-American are indeed treated unfairly in a broad sense.
+As for fairness measures, we can immediately see from that all measures are $\epsilon < 0.2$ for Caucasian and Hispanic that African-American are indeed treated unfairly in a broad sense.
 
 More specifically, African-American are treated more unfairly according to demographic parity, conditional statistical parity, mean difference, and equalized odds. This is again in accordance with the conclusion of the ProPublica report.
 
@@ -456,7 +446,7 @@ Although this dataset scenario falls in the CSV-as-input case in our framework, 
 
 The model was trained by splitting the original dataset into 3 partitions: 60\% of the data was used for training; 20\% was used for validation; and the rest 20\% was used for calculating fairness measures. Validation showed that the accuracy was about 60\%.
 
-We only chose equalized odds of the case where privileged group is Non-African-American for illustrative purposes. The equalized odds of our model is 0.35 and 0.46, while that of the COMPAS dataset is 0.23 and 0.22. So, our simple naive model is more unfair than COMPAS's model and could use some more fine-tuning.
+We only chose equalized odds of the case where unprivileged group is African-American for illustrative purposes. The equalized odds of our model is 0.35 and 0.46, while that of the COMPAS dataset is 0.23 and 0.22. So, our simple naive model is more unfair than COMPAS's model and could use some more fine-tuning.
 
 \section{Conclusion}
 Addressing the challenges brought upon by the rapid advancements in AI technologies and its introduced bias necessitates a rigorous assessment of AI system fairness. While fairness is subjective, it can be defined through various statistical measures. Our research contributes to this effort by proposing a comprehensive framework for auditing AI systems using multiple white-box fairness metrics, such as demographic parity, equalized odds, and overall accuracy equality.
@@ -468,31 +458,31 @@ By applying this framework to the COMPAS dataset, we confirmed that African-Amer
     \begin{minipage}[b]{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{Non-African-American}
-        \subcaption{Privileged Group: Non-African-American}\label{fig:1}
+        \subcaption{Privileged Group: African-American}\label{fig:1}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{Non-Caucasian}
-        \subcaption{Privileged Group: Non-Caucasian}\label{fig:2}
+        \subcaption{Privileged Group: Caucasian}\label{fig:2}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{Non-Asian}
-        \subcaption{Privileged Group: Non-Asian}\label{fig:2}
+        \subcaption{Privileged Group: Asian}\label{fig:2}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{Non-Native American}
-        \subcaption{Privileged Group: Non-Native American}\label{fig:2}
+        \subcaption{Privileged Group: Native American}\label{fig:2}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{Non-Hispanic}
-        \subcaption{Privileged Group: Non-Hispanic}\label{fig:2}
+        \subcaption{Privileged Group: Hispanic}\label{fig:2}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
@@ -509,7 +499,7 @@ By applying this framework to the COMPAS dataset, we confirmed that African-Amer
     \begin{minipage}[b]{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{Non-Less than 25}
-        \subcaption{Privileged Group: Non-Less than 25}\label{fig:1}
+        \subcaption{Privileged Group: Greater than 25}\label{fig:1}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
@@ -521,7 +511,7 @@ By applying this framework to the COMPAS dataset, we confirmed that African-Amer
     \begin{minipage}[b]{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{Non-25 - 45}
-        \subcaption{Privileged Group: Non-25 - 45}\label{fig:2}
+        \subcaption{Privileged Group: Less than 25 or Greater than 45}\label{fig:2}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
@@ -533,7 +523,7 @@ By applying this framework to the COMPAS dataset, we confirmed that African-Amer
     \begin{minipage}[b]{0.48\linewidth}
         \centering
         \includegraphics[width=\linewidth]{Non-Greater than 45}
-        \subcaption{Privileged Group: Non-Greater than 45}\label{fig:2}
+        \subcaption{Privileged Group: Less than 45}\label{fig:2}
     \end{minipage}
     \hfill
     \begin{minipage}[b]{0.48\linewidth}
