@@ -95,25 +95,15 @@ Correctional Offender Management Profiling for Alternative Sanctions (COMPAS) is
 
 Cases such as COMPAS underscore the critical importance of rigorously examining the fairness of AI systems by third parties. Fairness is fundamentally a subjective social construct, heavily influenced by cultural context and deeply rooted in historical inequalities. However, there have been developments in research leveraging statistical metrics to quantify fairness that provide transparent and objective insights.
 
-%TODO: clarify the og defs and the role our tools plays
-% 1 fairness measures and compas eq odds
-% 2 our framework's role and it can do these calcs "and more"
-% 3 3rd party is important and with our tool...
-% 4 transparency
-By employing such mathematically rigorous methodologies, our research can offer a deeper look into the fairness of AI systems, enabling third parties to make more informed and robust judgments. For example, it would reveal that the COMPAS system violates a fairness measure called equalized odds.
+These statistical metrics offer a systematic approach to evaluating fairness across various dimensions of AI systems. Among these metrics are disparate impact and demographic parity, to name a few. In particular, the findings of the COMPAS report revealed that it violates a critical metric known as equalized odds.
 
-%TODO: fit this in
-Including independent and trusted auditors is pivotal for objectivity and accountability; third parties are often further necessary for their specialized expertise in relevant domains. Auditors, equipped with our tool, can thoroughly review AI systems for bias and fairness violations.
+The function of our framework is to make comprehensive reviewing of statistical metrics accessible to third party auditors. Central to this role is the precise definition and flexible abstraction of the metrics. For example, our framework would reveal that the COMPAS dataset not only violates equalized odds but also conditional statistical parity and mean difference.
 
-%TODO:: rewrite following
-In addition to equalized odds, there are a number of fairness measures for AI systems. Our framework aims to help third parties apply these metrics and navigate complex datasets with ease, pinpointing instances of bias and discrimination.
+Including independent and trusted auditors is pivotal for objectivity and accountability. Moreover, the involvement of third parties is often indispensable due to their specialized expertise in relevant domains. Auditors, equipped with our tool, can thoroughly review AI systems for bias and fairness violations.
 
-With our tool, a third party such as ProPublica could clearly and easily demonstrate that COMPAS violates equalized odds according to their datasets. Our platform empowers organizations to conduct thorough assessments of AI fairness and uncover discrepancies in predictive models.
+Our tool builds upon transparent definitions widely accepted within the scientific community. By providing an abstraction layer atop these definitions, we enhance their flexibility and transparency, enabling users to adapt them to diverse contexts with ease and reveal them to the public. Moreover, we prioritize transparency throughout our tool's development process, offering access to the source code for scrutiny, thereby ensuring transparency from conception to implementation.
 
-%TODO: rewrite this. how is our tool transparent
-This functionality not only facilitates sound judgment but also fosters objectivity and transparency regarding AI systems, ultimately bolster the claim of fairness and justice in AI-enabled decision-making.
-
-Our tool is written in Python and is offered as a Python package. It supports common dataset formats such as CSV. It is open-sourced and publicly available for downloads.
+Our open-sourced tool is written in Python and is offered as a Python package. It supports common dataset formats such as CSV. The public domain source code is available at \url{https://github.com/RexYuan/Shu}.
 
 \section{Fairness Measures}
 \label{sec:measures}
@@ -289,8 +279,7 @@ For equal opportunity, recall its formal definition:
 \begin{align*}
     \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} \leq \epsilon
 \end{align*}
-To model the $Y$, $\hat{Y}$, and $S$, we define the corresponding $\tru$, $\pos$, and $\priv$. We have $Y = 1$ if and only if $\tru$ is true; $\hat{Y} = 1$ if and only if $\pos$ is true; $S = 1$ if and only if $\priv$ is true; and vice versa.
-%TODO: to calculate equal opp we call the function
+To model the $Y$, $\hat{Y}$, and $S$, we define the corresponding $\tru$, $\pos$, and $\priv$. We have $Y = 1$ if and only if $\tru$ is true; $\hat{Y} = 1$ if and only if $\pos$ is true; $S = 1$ if and only if $\priv$ is true; and vice versa. This way, we can calculate equal opportunity as a function:
 \begin{align*}
     \text{equal\_opportunity} (\epsilon, \model, \priv, \pos, \tru)
 \end{align*}
@@ -299,7 +288,7 @@ For positive balance, its formal definition is:
 \begin{align*}
     \abs{E[\hat{V} | Y = 0, S = 1] - E[\hat{V} | Y = 0, S \neq 1]} \leq \epsilon
 \end{align*}
-We model $Y$ and $S$ as the previous example. As for $\hat{V}$ we have it equal to the output of $\sco$, and now we can calculate the measure.
+We model $Y$ and $S$ as the previous example. As for $\hat{V}$ we have it equal to the output of $\sco$, and now we can calculate the measure. We calculate positive balance by calling the function:
 \begin{align*}
     \text{positive\_balance} (\epsilon, \model, \priv, \sco, \tru)
 \end{align*}
@@ -308,7 +297,7 @@ For equal calibration, recall its formal definition:
 \begin{align*}
     \abs{P[Y = 1 | S = 1, \hat{V} = v] - P[Y = 1 | S \neq 1, \hat{V} = v]} \leq \epsilon
 \end{align*}
-Here we model $Y$ and $S$ as above. As for $\hat{V} = v$, we abstracted $\hat{V}$ with $\calib$ and $v$ with $args$. We have $\hat{V} = v$ if and only if $\calib(v, r_i)$ is true.
+Here we model $Y$ and $S$ as above. As for $\hat{V} = v$, we abstracted $\hat{V}$ with $\calib$ and $v$ with $args$. We have $\hat{V} = v$ if and only if $\calib(v)(r_i)$ is true. We calculate equal calibration by calling the function:
 \begin{align*}
     \text{equal\_calibration} (\epsilon, \model, \priv, \calib, \tru, (v))
 \end{align*}
@@ -317,7 +306,7 @@ For conditional statistical parity, its formal definition is:
 \[
     \abs{P[\hat{Y} = 1 | S = 1, L = l] - P[\hat{Y} = 1 | S \neq 1, L = l]} \leq \epsilon
 \]
-$\hat{Y}$ and $S$ are modeled as above. As for $L = l$, we abstracted it similarly to the case above by having $L = l$ if and only if $\leg(l)$ is true.
+$\hat{Y}$ and $S$ are modeled as above. As for $L = l$, we abstracted it similarly to the case above by having $L = l$ if and only if $\leg(l)(r_i)$ is true. We calculate conditional statistical parity by calling the function:
 \begin{align*}
     \text{conditional\_statistical\_parity} (\epsilon, \model, \priv, \pos, \leg, (l))
 \end{align*}
@@ -408,8 +397,9 @@ Negative Balance & 1.4 & ? \\
 \end{table}
 
 \subsection{Fairness Analysis of African-American group}
-%TODO: explain why other measures still work because they're taking the difference
-On first blush, it is curious that it satisfies disparate impact but not demographic parity. However, if we return to the definition, we would see that disparate impact is meant to be used when being marked positive is an advantaged thing, while here in the COMPAS example, being marked positive is a disadvantaged thing. Thus, henceforth we will exclude disparate impact from our analysis.
+On first blush, it is curious that it satisfies disparate impact but not demographic parity. However, if we return to the definition, we would see that disparate impact is meant to be used when being marked positive is an advantaged thing, while here in the COMPAS example, being marked positive is a disadvantaged thing.
+
+It deceives the eye due to its definition being a ratio that lacks symmetry upon interchange of its components. Henceforth we will exclude disparate impact from our analysis of COMPAS. On the contrary, the other measures remain unaffected since their definitions are the absolute values of a difference.
 
 We can then immediately tell from the failing demographic parity, mean difference, and conditional statistical parity that COMPAS prediction results were unfair against African-American, even if we only consider the ones with prior crimes.
 
