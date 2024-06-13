@@ -296,9 +296,9 @@ class fairness_model_checker:
                           ratio: float,
                           model: object,
                           privileged_predicate: Callable[[csv_row], bool],
+                          truth_predicate: Callable[[csv_row], bool],
                           calib_predicate_h: Callable[..., Callable[[csv_row], bool]],
-                          calib_arg: Tuple[Any, ...],
-                          truth_predicate: Callable[[csv_row], bool]) -> bool:
+                          calib_arg: Tuple[Any, ...]) -> bool:
         """
         Evaluates the equal calibration of the model's predictions between privileged and unprivileged groups.
 
@@ -521,14 +521,14 @@ class fairness_model_checker:
 
         return measure < ratio
 
-    def nagative_balance(self,
+    def negative_balance(self,
                          ratio: float,
                          model: object,
                          privileged_predicate: Callable[[csv_row], bool],
                          score_predicate: Callable[[csv_row], bool],
                          truth_predicate: Callable[[csv_row], bool]) -> bool:
         """
-        Evaluates the nagative balance of the model's predictions between privileged and unprivileged groups.
+        Evaluates the negative balance of the model's predictions between privileged and unprivileged groups.
 
         Parameters:
         ratio (float): The fairness threshold ratio.
@@ -820,9 +820,9 @@ class fairness_csv_checker:
     def equal_calibration(self,
                           ratio: float,
                           privileged_predicate: Callable[[csv_row], bool],
+                          truth_predicate: Callable[[csv_row], bool],
                           calib_predicate_h: Callable[..., Callable[[csv_row], bool]],
-                          calib_arg: Tuple[Any, ...],
-                          truth_predicate: Callable[[csv_row], bool]) -> bool:
+                          calib_arg: Tuple[Any, ...]) -> bool:
         """
         Evaluates the equal calibration of the model's predictions between privileged and unprivileged groups.
 
@@ -988,13 +988,13 @@ class fairness_csv_checker:
 
         return measure < ratio
 
-    def nagative_balance(self,
+    def negative_balance(self,
                          ratio: float,
                          privileged_predicate: Callable[[csv_row], bool],
                          score_predicate: Callable[[csv_row], bool],
                          truth_predicate: Callable[[csv_row], bool]) -> bool:
         """
-        Evaluates the nagative balance of the model's predictions between privileged and unprivileged groups.
+        Evaluates the negative balance of the model's predictions between privileged and unprivileged groups.
 
         Parameters:
         ratio (float): The fairness threshold ratio.
