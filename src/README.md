@@ -14,7 +14,7 @@ pip3 install fairness-checker
 
 ## Usage
 
-## As a library
+### As a library
 
 First set up the checker using a benchmark dataset:
 
@@ -86,7 +86,7 @@ lambda x: (lambda row: int(row['priors_count']) > x)
 
 and the argument to it, `legitimate_arg`, is `(0,)`.
 
-## As a command line CLI
+### As a command line CLI
 
 Prepare your dataset file. Create a predicate definition file containing arguments to the measure functions. For example, to calculate negative balance, create a file `test_predicates1.py` containing the following:
 
