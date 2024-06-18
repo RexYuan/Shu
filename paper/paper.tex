@@ -26,20 +26,7 @@
 \begin{document}
 
 \title{Ensuring Fairness with Transparent Auditing of Quantitative Bias in AI Systems\\
-\thanks{Identify applicable funding agency here. If none, delete this.}
-}
-
-\author{\IEEEauthorblockN{1\textsuperscript{st} Given Name Surname}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address or ORCID}
-\and
-\IEEEauthorblockN{2\textsuperscript{nd} Given Name Surname}
-\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-\textit{name of organization (of Aff.)}\\
-City, Country \\
-email address or ORCID}
+\thanks{This project is partially supported by NSTC 112-2634-F-002-004 from National Science and Technology Council and AS-GCS-113-H04 from Academia Sinica.}
 }
 
 \DeclarePairedDelimiter{\set}{\{}{\}}
@@ -61,18 +48,18 @@ email address or ORCID}
 
 \newcommand{\bye}[1]{}
 
-% \author{\IEEEauthorblockN{1\textsuperscript{st} Chih-Cheng Rex Yuan}
-% \IEEEauthorblockA{\textit{Institute of Information Science} \\
-% \textit{Academia Sinica}\\
-% Taipei, Taiwan \\
-% hello@rexyuan.com}
-% \and
-% \IEEEauthorblockN{2\textsuperscript{nd} Bow-Yaw Wang}
-% \IEEEauthorblockA{\textit{Institute of Information Science} \\
-% \textit{Academia Sinica}\\
-% Taipei, Taiwan \\
-% bywang@iis.sinica.edu.tw}
-% }
+\author{\IEEEauthorblockN{Chih-Cheng Rex Yuan}
+\IEEEauthorblockA{\textit{Institute of Information Science} \\
+\textit{Academia Sinica}\\
+Taipei, Taiwan \\
+hello@rexyuan.com}
+\and
+\IEEEauthorblockN{Bow-Yaw Wang}
+\IEEEauthorblockA{\textit{Institute of Information Science} \\
+\textit{Academia Sinica}\\
+Taipei, Taiwan \\
+bywang@iis.sinica.edu.tw}
+}
 
 \maketitle
 
@@ -89,7 +76,7 @@ The accelerating pace of artificial intelligence (AI) technologies has revolutio
 
 One of its most profound impacts is how AI has transformed decision-making processes across sectors. By harnessing vast amounts of data and employing advanced algorithms, AI empowers organizations to make more informed and strategic decisions. From assessing job applicants to determining school admissions, AI-driven insights offer efficient and analytical advantages.
 
-AI system, however, may be biased. Factors such as inherent biases in original data sets or flaws in algorithm designs could contribute to bias within AI systems. When left unchecked, the ramifications of such biases extend far beyond mere inaccuracies; they can lead to devastating consequences, such as amplifying systemic injustices, perpetuating group discrimination, and exacerbating societal inequalities.
+AI systems, however, may be biased. Factors such as inherent biases in original data sets or flaws in algorithm designs could contribute to bias within AI systems. When left unchecked, the ramifications of such biases extend far beyond mere inaccuracies; they can lead to devastating consequences, such as amplifying systemic injustices, perpetuating group discrimination, and exacerbating societal inequalities.
 
 Correctional Offender Management Profiling for Alternative Sanctions (COMPAS) is a tool for predicting recidivism---the tendency of criminals to reoffend. It is used in the criminal justice system in multiple states in the United States. In 2016, it was discovered in an investigation by the journalists at ProPublica that the COMPAS system is, in fact, unfair towards minority and disadvantaged groups.
 
@@ -101,16 +88,16 @@ The function of our framework is to make comprehensive reviewing of statistical 
 
 Including independent and trusted auditors is pivotal for objectivity and accountability. Moreover, the involvement of third parties is often indispensable due to their specialized expertise in relevant domains. Auditors, equipped with our tool, can thoroughly review AI systems for bias and fairness violations.
 
-Our tool builds upon transparent definitions widely accepted within the scientific community. By providing an abstraction layer atop these definitions, we enhance their flexibility and transparency, enabling users to adapt them to diverse contexts with ease and reveal them to the public. Moreover, we prioritize transparency throughout our tool's development process, offering access to the source code for scrutiny, thereby ensuring transparency from conception to implementation.
+Our tool builds upon transparent definitions widely accepted within the scientific community. By providing an abstraction layer atop these definitions, we enhance their flexibility and transparency, which enables users to adapt them to diverse contexts with ease and reveal them to the public. Moreover, we prioritize transparency throughout our tool's development process, offering access to the source code for scrutiny, thereby ensuring transparency from conception to implementation.
 
-Our open-sourced tool is written in Python and is offered as a Python package. It supports common dataset formats such as CSV. The public domain source code is available at \url{https://github.com/RexYuan/Shu}.
+Our open-sourced tool is written in Python and is offered as a Python package. It supports common dataset formats such as CSV. The package is available at \url{https://pypi.org/project/fairness-checker/}.
 
 \section{Fairness Measures}
 \label{sec:measures}
 Fairness is about making sure the disadvantaged and unprivileged groups of individuals are treated equitably. However, there have been several interpretations of it proposed in the past. To have a constructive discussion on fairness, we must first have precise definitions of it. Pessach and Shmueli \cite{pessach2022review} formulated a number of fairness measures in a unified mathematical notation. We will base our framework on their formulation.
 
 \subsection{Preliminaries}
-For the following definition, we will use $Y$ to denote the ground truth of an outcome; $\hat{Y}$ to denote the predicated result of an outcome; $Y = 1$ and $\hat{Y} = 1$ to denote them being accepted or positive. For example, let $Y$ be recidivism. Then $Y = 1$ means the case of an individual actually recidivating and $\hat{Y} = 0$ means the prediction of an individual recidivating is negative. In addition, we use $V$ and $\hat{V}$ when the truth and the prediction aren't binary. For example, we denote the COMPAS score by $\hat{V}$, which ranges from 1 to 10.
+For the following definition, we will use $Y$ to denote the ground truth of an outcome; $\hat{Y}$ to denote the predicated result of an outcome; $Y = 1$ and $\hat{Y} = 1$ to denote them being accepted or positive. For example, let $Y$ be recidivism. Then $Y = 1$ means the case of an individual actually recidivating and $\hat{Y} = 0$ means the prediction of an individual recidivating is negative. In addition, we use $V$ and $\hat{V}$ when the truth and the prediction are not binary. For example, we denote the COMPAS score by $\hat{V}$, which ranges from 1 to 10.
 
 \emph{Protected attributes} are the characteristics of individuals that are, for example, legally or ethically, considered sensitive and warrant protection against discrimination and bias. We denote by $S$ some protected attribute. We write $S = 1$ to represent the \emph{privileged group} and $S \neq 1$ to represent the \emph{unprivileged group}. For example, let $S$ be Caucasian. Then $S = 1$ represents the case of an individual's race being Caucasian and $S \neq 1$ vice versa.
 
@@ -262,16 +249,16 @@ A \emph{privileged predicate} $\priv : \mathtt{row} \implies \mathtt{bool}$ take
 
 A \emph{positive predicate} of rows $\pos : \mathtt{row} \implies \mathtt{bool}$ takes a row and determines if its prediction is positive. For example, $\pos(r_i) := \mathtt{int}(r_i(\text{``score''})) > 7$ means a row's prediction is positive if its score is greater than 7. A positive predicate of model results $\posm : \alpha \implies \mathtt{bool}$ takes a model's result and determines if it is positive. In the simplest case, the model returns a $\mathtt{bool}$, and the positive predicate can just be the identity function.
 
-A \emph{score predicate} of rows $\sco : \mathtt{row} \implies \alpha$ takes a row and gives its predicted score. Similar to positive predicate, a score predicate of model results $\scom : \alpha \implies \beta$ takes a model's result and gives its score.
+A \emph{score predicate} of rows $\sco : \mathtt{row} \implies \beta$ takes a row and gives its predicted score of some type $\beta$. Similar to positive predicate, a score predicate of model results $\scom : \alpha \implies \beta$ takes a model's result and gives its score.
 
 A \emph{ground truth predicate} $\tru : \mathtt{row} \implies \mathtt{bool}$ takes a row and gives the ground truth of the result.
 
-A \emph{legitimate predicate} $\leg : \prod_i \alpha_i \implies \mathtt{row} \implies \mathtt{bool}$ takes $n$ parameters and returns a row predicate. For example, $\leg(x)(r_i) := \mathtt{int}(r_i(\text{``priors\_count''})) > x$ first take a parameter $x$ and then decides if priors count is larger than it.
+A \emph{legitimate predicate} $\leg : \prod_i \alpha_i \implies \mathtt{row} \implies \mathtt{bool}$ takes $n$ parameters and returns a row predicate. For example, $\leg(x)(r_i) := \mathtt{int}(r_i(\text{``priors\_count''})) > x$ first takes a parameter $x$ and then decides if priors count is larger than it.
 
 A \emph{calibration predicate} $\calib : \prod_i \alpha_i \implies \mathtt{row} \implies \mathtt{bool}$, takes $n$ parameters and returns a row predicate. For example, $\calib(u, l)(r_i) := l < \mathtt{int}(r_i(\text{``score''})) < u$ first takes two parameters $u,l$ as upper bound and lower bound, and then decides if $r_i$'s prediction score is between them.
 
 \subsection{Definitions}
-We abstracted the idea of privileged groups and positive prediction as predicates to maximize flexibility. With the proper predicates, any model output can be used; even prose-like responses of generative models can be included given adequate predicates.
+We abstracted the idea of privileged groups and positive prediction as predicates to maximize flexibility. With proper predicates, any model output can be used; even prose-like responses of generative models can be included given adequate predicates.
 
 Given a dataset $\db$ for auditing use, and given CSV prediction results or the prediction model $\model$ itself, we can calculate the fairness measures by modeling the statistical random variables mentioned in Section~\ref{sec:measures} with our predicates. We demonstrate this process in the following for a few selected measures; all the other measures can be modeled similarly.
 
@@ -279,7 +266,7 @@ For equal opportunity, recall its formal definition:
 \begin{align*}
     \abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} \leq \epsilon
 \end{align*}
-To model the $Y$, $\hat{Y}$, and $S$, we define the corresponding $\tru$, $\pos$, and $\priv$. We have $Y = 1$ if and only if $\tru$ is true; $\hat{Y} = 1$ if and only if $\pos$ is true; $S = 1$ if and only if $\priv$ is true; and vice versa. This way, we can calculate equal opportunity as a function:
+To model $Y$, $\hat{Y}$, and $S$, we define the corresponding $\tru$, $\pos$, and $\priv$. We have $Y = 1$ if and only if $\tru$ is true; $\hat{Y} = 1$ if and only if $\pos$ is true; $S = 1$ if and only if $\priv$ is true; and vice versa. This way, we can calculate equal opportunity as a function:
 \begin{align*}
     \text{equal\_opportunity} (\epsilon, \model, \priv, \pos, \tru)
 \end{align*}
@@ -328,7 +315,7 @@ ProPublica is an American non-profit journalism organization focused on public i
 
 We shall start applying our framework. There is generally no formal guide on how to set $\epsilon$, so we will take the 80\% rule's case and set it as $\epsilon = 0.2$.
 
-We will set the unprivileged predicate be to ``African-American'' so that the unprivileged group will be African-American to test if the African-American race is discriminated.
+We will set the unprivileged predicate to be ``African-American'' so that the unprivileged group will be African-American. Then we test if the African-American race is discriminated.
 \[
     \priv(r_i) := r_i(\text{``race''}) \neq \text{``African-American''}
 \]
@@ -337,7 +324,6 @@ As ProPublica referenced Northpointe's COMPAS Practitioners Guide and cited that
 \[
     \pos(r_i) := r_i(\text{``score\_text''}) \in \set{\text{``Medium''},\text{``High''}}
 \]
-On the other hand, when we're taking prediction input from our makeshift model, we simply return its result because it already gives a binary $\mathtt{bool}$ result: $\posm(r_i) := \model(r_i)$
 
 For the ground truth predicate, the recidivism data is already present in the ProPublica dataset, so all we have to do is a simple lookup.
 \[
