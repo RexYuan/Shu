@@ -18,13 +18,14 @@ def print_stats(title, measure, ratio):
         print(f"{fair_string}: {measure:.{precision}f} < {ratio}")
 
 class fairness_model_checker:
-    def __init__(self, raw_file: str):
+    def __init__(self, raw_file: str, verbose: bool = True):
         """
         Initializes the fairness checker.
 
         Parameters:
         raw_file (str): Path to the raw data file in CSV format.
         """
+        self.verbose = verbose
         with open(raw_file, 'r') as file:
             reader = csv.DictReader(file)
             self.fieldnames = reader.fieldnames
@@ -78,8 +79,8 @@ class fairness_model_checker:
 
         measure = unprivileged_percentage / privileged_percentage
 
-        print('disparate impact')
-        print('fair: {0:.2f} > {1}'.format(measure, ratio))
+        if self.verbose:
+            print_stats('disparate impact', measure, ratio)
 
         if value:
             return measure
@@ -117,7 +118,8 @@ class fairness_model_checker:
 
         measure = abs(unprivileged_percentage - privileged_percentage)
 
-        print_stats('demographic parity', measure, ratio)
+        if self.verbose:
+            print_stats('demographic parity', measure, ratio)
 
         if value:
             return measure
@@ -156,7 +158,9 @@ class fairness_model_checker:
         privileged_untruth_percentage = len(list(filter(positive_predicate, privileged_untruth_Y_pred))) / len(privileged_untruth_Y_pred)
         unprivileged_untruth_percentage = len(list(filter(positive_predicate, unprivileged_untruth_Y_pred))) / len(unprivileged_untruth_Y_pred)
         measure1 = abs(privileged_untruth_percentage - unprivileged_untruth_percentage)
-        print_stats('equalized odds: false positive', measure1, ratio)
+
+        if self.verbose:
+            print_stats('equalized odds: false positive', measure1, ratio)
 
         # true positive
         privileged_truth = filter(lambda row: privileged_predicate(row) and truth_predicate(row), self.reader)
@@ -171,7 +175,8 @@ class fairness_model_checker:
         unprivileged_truth_percentage = len(list(filter(positive_predicate, unprivileged_truth_Y_pred))) / len(unprivileged_truth_Y_pred)
         measure2 = abs(privileged_truth_percentage - unprivileged_truth_percentage)
 
-        print_stats('equalized odds: true positive', measure2, ratio)
+        if self.verbose:
+            print_stats('equalized odds: true positive', measure2, ratio)
 
         if value:
             return measure1, measure2
@@ -211,7 +216,8 @@ class fairness_model_checker:
         unprivileged_truth_percentage = len(list(filter(positive_predicate, unprivileged_truth_Y_pred))) / len(unprivileged_truth_Y_pred)
         measure = abs(privileged_truth_percentage - unprivileged_truth_percentage)
 
-        print_stats('equal_opportunity: true positive', measure, ratio)
+        if self.verbose:
+            print_stats('equal_opportunity: true positive', measure, ratio)
 
         if value:
             return measure
@@ -256,7 +262,8 @@ class fairness_model_checker:
 
         measure = abs(privileged_accurate_percentage - unprivileged_accurate_percentage)
 
-        print_stats('accuracy equality', measure, ratio)
+        if self.verbose:
+            print_stats('accuracy equality', measure, ratio)
 
         if value:
             return measure
@@ -304,7 +311,8 @@ class fairness_model_checker:
         unprivileged_positive_truth_percentage = len(unprivileged_positive_truth) / len(unprivileged_positive)
         measure = abs(privileged_positive_truth_percentage - unprivileged_positive_truth_percentage)
 
-        print_stats('predictive parity', measure, ratio)
+        if self.verbose:
+            print_stats('predictive parity', measure, ratio)
 
         if value:
             return measure
@@ -355,7 +363,8 @@ class fairness_model_checker:
         unprivileged_positive_truth_percentage = len(unprivileged_positive_truth) / len(unprivileged_score)
         measure = abs(privileged_positive_truth_percentage - unprivileged_positive_truth_percentage)
 
-        print_stats('equal calibration', measure, ratio)
+        if self.verbose:
+            print_stats('equal calibration', measure, ratio)
 
         if value:
             return measure
@@ -402,7 +411,8 @@ class fairness_model_checker:
         unprivileged_legitimate_positive_percentage = len(unprivileged_legitimate_positive) / len(unprivileged_legitimate)
         measure = abs(privileged_legitimate_positive_percentage - unprivileged_legitimate_positive_percentage)
 
-        print_stats('conditional statistical parity', measure, ratio)
+        if self.verbose:
+            print_stats('conditional statistical parity', measure, ratio)
 
         if value:
             return measure
@@ -442,7 +452,8 @@ class fairness_model_checker:
         unprivileged_untruth_percentage = len(list(filter(positive_predicate, unprivileged_untruth_Y_pred))) / len(unprivileged_untruth_Y_pred)
         measure = abs(privileged_untruth_percentage - unprivileged_untruth_percentage)
 
-        print_stats('predictive equality: false positive', measure, ratio)
+        if self.verbose:
+            print_stats('predictive equality: false positive', measure, ratio)
 
         if value:
             return measure
@@ -490,7 +501,8 @@ class fairness_model_checker:
         unprivileged_positive_truth_percentage = len(unprivileged_positive_truth) / len(unprivileged_positive)
         measure1 = abs(privileged_positive_truth_percentage - unprivileged_positive_truth_percentage)
 
-        print_stats('conditional use accuracy equality: true positive', measure1, ratio)
+        if self.verbose:
+            print_stats('conditional use accuracy equality: true positive', measure1, ratio)
 
         privileged_negative = list(filter(lambda row_Y: privileged_predicate(row_Y[0]) and not positive_predicate(row_Y[1]), zip(self.reader, privileged_Y_pred)))
         unprivileged_negative = list(filter(lambda row_Y: not privileged_predicate(row_Y[0]) and not positive_predicate(row_Y[1]), zip(self.reader, unprivileged_Y_pred)))
@@ -505,7 +517,8 @@ class fairness_model_checker:
         unprivileged_negative_untruth_percentage = len(unprivileged_negative_untruth) / len(unprivileged_negative)
         measure2 = abs(privileged_negative_untruth_percentage - unprivileged_negative_untruth_percentage)
 
-        print_stats('conditional use accuracy equality: true negative', measure2, ratio)
+        if self.verbose:
+            print_stats('conditional use accuracy equality: true negative', measure2, ratio)
 
         if value:
             return measure1, measure2
@@ -548,7 +561,8 @@ class fairness_model_checker:
 
         measure = abs(privileged_truth_score_mean - unprivileged_truth_score_mean)
 
-        print_stats('positive balance', measure, ratio)
+        if self.verbose:
+            print_stats('positive balance', measure, ratio)
 
         if value:
             return measure
@@ -591,7 +605,8 @@ class fairness_model_checker:
 
         measure = abs(privileged_untruth_score_mean - unprivileged_untruth_score_mean)
 
-        print_stats('negative balance', measure, ratio)
+        if self.verbose:
+            print_stats('negative balance', measure, ratio)
 
         if value:
             return measure
@@ -635,20 +650,22 @@ class fairness_model_checker:
 
         measure = abs(privileged_positive_percentage - unprivileged_positive_percentage)
 
-        print_stats('mean difference', measure, ratio)
+        if self.verbose:
+            print_stats('mean difference', measure, ratio)
 
         if value:
             return measure
         return measure < ratio
 
 class fairness_csv_checker:
-    def __init__(self, raw_file: str):
+    def __init__(self, raw_file: str, verbose: bool = True):
         """
         Initializes the fairness checker.
 
         Parameters:
         raw_file (str): Path to the raw data file in CSV format.
         """
+        self.verbose = verbose
         with open(raw_file, 'r') as file:
             reader = csv.DictReader(file)
             self.fieldnames = reader.fieldnames
@@ -681,8 +698,8 @@ class fairness_csv_checker:
 
         measure = unprivileged_percentage / privileged_percentage
 
-        print('disparate impact')
-        print('fair: {0:.2f} > {1}'.format(measure, ratio))
+        if self.verbose:
+            print_stats('disparate impact', measure, ratio)
 
         if value:
             return measure
@@ -715,7 +732,8 @@ class fairness_csv_checker:
 
         measure = abs(unprivileged_percentage - privileged_percentage)
 
-        print_stats('demographic parity', measure, ratio)
+        if self.verbose:
+            print_stats('demographic parity', measure, ratio)
 
         if value:
             return measure
@@ -749,7 +767,9 @@ class fairness_csv_checker:
         privileged_untruth_percentage = len(privileged_untruth_Y_result) / len(privileged_untruth)
         unprivileged_untruth_percentage = len(unprivileged_untruth_Y_result) / len(unprivileged_untruth)
         measure1 = abs(privileged_untruth_percentage - unprivileged_untruth_percentage)
-        print_stats('equalized odds: false positive', measure1, ratio)
+
+        if self.verbose:
+            print_stats('equalized odds: false positive', measure1, ratio)
 
         # true positive
         privileged_truth = list(filter(lambda row: privileged_predicate(row) and truth_predicate(row), self.reader))
@@ -762,7 +782,8 @@ class fairness_csv_checker:
         unprivileged_truth_percentage = len(unprivileged_truth_Y_result) / len(unprivileged_truth)
         measure2 = abs(privileged_truth_percentage - unprivileged_truth_percentage)
 
-        print_stats('equalized odds: true positive', measure2, ratio)
+        if self.verbose:
+            print_stats('equalized odds: true positive', measure2, ratio)
 
         if value:
             return measure1, measure2
@@ -797,7 +818,8 @@ class fairness_csv_checker:
         unprivileged_truth_percentage = len(unprivileged_truth_Y_result) / len(unprivileged_truth)
         measure = abs(privileged_truth_percentage - unprivileged_truth_percentage)
 
-        print_stats('equal_opportunity: true positive', measure, ratio)
+        if self.verbose:
+            print_stats('equal_opportunity: true positive', measure, ratio)
 
         if value:
             return measure
@@ -834,7 +856,8 @@ class fairness_csv_checker:
 
         measure = abs(privileged_accurate_percentage - unprivileged_accurate_percentage)
 
-        print_stats('accuracy equality', measure, ratio)
+        if self.verbose:
+            print_stats('accuracy equality', measure, ratio)
 
         if value:
             return measure
@@ -868,7 +891,8 @@ class fairness_csv_checker:
         unprivileged_positive_truth_percentage = len(unprivileged_positive_truth) / len(unprivileged_positive)
         measure = abs(privileged_positive_truth_percentage - unprivileged_positive_truth_percentage)
 
-        print_stats('predictive parity', measure, ratio)
+        if self.verbose:
+            print_stats('predictive parity', measure, ratio)
 
         if value:
             return measure
@@ -905,7 +929,8 @@ class fairness_csv_checker:
         unprivileged_positive_truth_percentage = len(unprivileged_positive_truth) / len(unprivileged_score)
         measure = abs(privileged_positive_truth_percentage - unprivileged_positive_truth_percentage)
 
-        print_stats('equal calibration', measure, ratio)
+        if self.verbose:
+            print_stats('equal calibration', measure, ratio)
 
         if value:
             return measure
@@ -941,7 +966,8 @@ class fairness_csv_checker:
         unprivileged_legitimate_positive_percentage = len(unprivileged_legitimate_positive) / len(unprivileged_legitimate)
         measure = abs(privileged_legitimate_positive_percentage - unprivileged_legitimate_positive_percentage)
 
-        print_stats('conditional statistical parity', measure, ratio)
+        if self.verbose:
+            print_stats('conditional statistical parity', measure, ratio)
 
         if value:
             return measure
@@ -976,7 +1002,8 @@ class fairness_csv_checker:
         unprivileged_untruth_percentage = len(unprivileged_untruth_Y_result) / len(unprivileged_untruth)
         measure = abs(privileged_untruth_percentage - unprivileged_untruth_percentage)
 
-        print_stats('predictive equality: false positive', measure, ratio)
+        if self.verbose:
+            print_stats('predictive equality: false positive', measure, ratio)
 
         if value:
             return measure
@@ -1010,7 +1037,8 @@ class fairness_csv_checker:
         unprivileged_positive_truth_percentage = len(unprivileged_positive_truth) / len(unprivileged_positive)
         measure1 = abs(privileged_positive_truth_percentage - unprivileged_positive_truth_percentage)
 
-        print_stats('conditional use accuracy equality: true positive', measure1, ratio)
+        if self.verbose:
+            print_stats('conditional use accuracy equality: true positive', measure1, ratio)
 
         privileged_negative = list(filter(lambda row: privileged_predicate(row) and not positive_predicate(row), self.reader))
         unprivileged_negative = list(filter(lambda row: not privileged_predicate(row) and not positive_predicate(row), self.reader))
@@ -1022,7 +1050,8 @@ class fairness_csv_checker:
         unprivileged_negative_untruth_percentage = len(unprivileged_negative_untruth) / len(unprivileged_negative)
         measure2 = abs(privileged_negative_untruth_percentage - unprivileged_negative_untruth_percentage)
 
-        print_stats('conditional use accuracy equality: true negative', measure2, ratio)
+        if self.verbose:
+            print_stats('conditional use accuracy equality: true negative', measure2, ratio)
 
         if value:
             return measure1, measure2
@@ -1054,7 +1083,8 @@ class fairness_csv_checker:
 
         measure = abs(privileged_truth_score_mean - unprivileged_truth_score_mean)
 
-        print_stats('positive balance', measure, ratio)
+        if self.verbose:
+            print_stats('positive balance', measure, ratio)
 
         if value:
             return measure
@@ -1086,7 +1116,8 @@ class fairness_csv_checker:
 
         measure = abs(privileged_untruth_score_mean - unprivileged_untruth_score_mean)
 
-        print_stats('negative balance', measure, ratio)
+        if self.verbose:
+            print_stats('negative balance', measure, ratio)
 
         if value:
             return measure
@@ -1119,7 +1150,8 @@ class fairness_csv_checker:
 
         measure = abs(privileged_positive_percentage - unprivileged_positive_percentage)
 
-        print_stats('mean difference', measure, ratio)
+        if self.verbose:
+            print_stats('mean difference', measure, ratio)
 
         if value:
             return measure
