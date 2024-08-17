@@ -6,6 +6,8 @@
 *.toc
 *.bbl
 *.blg
+*.vrb
+_minted-*
 .mypy_cache
 build
 dist

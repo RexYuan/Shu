@@ -11,6 +11,7 @@
 \usepackage{amssymb}
 \usepackage{mathtools}
 \usepackage{subcaption}
+\usepackage{minted}
 \usepackage{xcolor}
 \usepackage{ulem}
 \usepackage{hyperref}
@@ -381,6 +382,28 @@ Quantitative Bias in AI Systems}
     \end{align*}
 \end{frame}
 
+\begin{frame}[fragile]
+    \frametitle{Definition}
+    \begin{align*}
+        \text{equal\_opportunity} (\epsilon, \priv, \pos, \tru)
+    \end{align*}
+
+    This is implemented in our tool as a Python function:
+
+    \begin{center}
+    \begin{minipage}{0.8\textwidth}
+    \begin{minted}[fontsize=\small, frame=single, linenos]{python}
+def equal_opportunity(
+    ratio,
+    privileged_predicate,
+    positive_predicate,
+    truth_predicate):
+    ...
+    \end{minted}
+    \end{minipage}
+    \end{center}
+\end{frame}
+
 \begin{frame}
     \frametitle{Application}
     For demonstration, we analyzed the COMPAS dataset.
@@ -391,6 +414,28 @@ Quantitative Bias in AI Systems}
         \tru(r_i)  & := r_i(\text{``two\_year\_recid''}) == \text{True}
     \end{align*}
     These predicates can be published for transparency.
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Application}
+    \begin{align*}
+        \priv(r_i) & := r_i(\text{``race''}) \neq \text{``African-American''}\\
+        \pos(r_i)  & := r_i(\text{``score\_text''}) \in \set{\text{``Medium''},\text{``High''}}\\
+        \tru(r_i)  & := r_i(\text{``two\_year\_recid''}) == \text{True}
+    \end{align*}
+    These predicates can then be encoded with Python functions:
+    \begin{center}
+    \begin{minipage}{0.8\textwidth}
+    \begin{minted}[fontsize=\small, frame=single, linenos]{python}
+equal_opportunity(
+    0.2,
+    lambda row: row['race'] == 'African-American',
+    lambda row: row['score_text']
+      in {'Medium', 'High'},
+    lambda row: row['is_recid'] == '1')
+    \end{minted}
+    \end{minipage}
+    \end{center}
 \end{frame}
 
 \begin{frame}
@@ -421,6 +466,8 @@ Quantitative Bias in AI Systems}
         \item With our framework tool, auditors can comprehensively
         review the fairness of an AI system.
     \end{itemize}
+
+    This slides is available at \url{https://github.com/RexYuan/Shu}.
 \end{frame}
 
 \end{document}
