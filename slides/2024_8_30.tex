@@ -24,7 +24,7 @@
 \graphicspath{{images/}}
 \DeclareGraphicsExtensions{.pdf}
 
-\newdate{date}{20}{08}{2024}
+\newdate{date}{30}{08}{2024}
 \date{\displaydate{date}}
 \title[Fairness]{Ensuring Fairness with Transparent Auditing of
 Quantitative Bias in AI Systems}
@@ -55,7 +55,7 @@ Quantitative Bias in AI Systems}
 \end{frame}
 
 \begin{frame}
-    \frametitle{Bias}
+    \frametitle{AI Bias}
     \begin{itemize}
         \item AI is widely used in decision making:
         \begin{itemize}
@@ -146,7 +146,8 @@ Quantitative Bias in AI Systems}
     attributes.
 
     Let's set $\epsilon = 0.2$.
-    If for some job opening there are $10$ female applicants and
+    If for some job opening, male is the privileged group and
+    there are $10$ female applicants and
     $100$ male applicants, and there are $8$ accepted females
     and $90$ accepted males:
     \[
@@ -251,20 +252,49 @@ Quantitative Bias in AI Systems}
 
 \begin{frame}
     \frametitle{Other Measures}
-    \begin{itemize}
-        \item Overall accuracy equality:
-        \[
-            \abs{P[Y = \hat{Y} | S = 1] - P[Y = \hat{Y} | S \neq 1]} \leq \epsilon
-        \]
-        where $Y = \hat{Y}$ means that the prediction was correct.
-        \item Predictive parity:
-        \[
-            \abs{P[Y = 1 | S = 1, \hat{Y} = 1] - P[Y = 1 | S \neq 1, \hat{Y} = 1]} \leq \epsilon
-        \]
-        This requires that the ``positive predictive values'' are similar across
-        groups, meaning the probability of an individual with a positive prediction
-        actually experiencing a positive outcome.
-    \end{itemize}
+        \begin{table}[h]
+            \centering
+            \resizebox{0.93\textwidth}{!}{
+            % \resizebox{\columnwidth}{!}{
+            \begin{tabular}{|l|c|} % 'l' specifies left alignment for the first column
+                \hline
+                \textbf{Fairness Measure} & \textbf{Definition} \\
+                \hline
+        Disparate Impact & $\frac{P[\hat{Y} = 1 | S \neq 1]}{P[\hat{Y} = 1 | S = 1]} \geq 1 - \epsilon$ \\
+        \hline
+        Demographic Parity & $\abs{P[\hat{Y} = 1 | S = 1] - P[\hat{Y} = 1 | S \neq 1]} \leq \epsilon$ \\
+        \hline
+        Conditional Statistical Parity & $\abs{P[\hat{Y} = 1 | S = 1, L = l] - P[\hat{Y} = 1 | S \neq 1, L = l]} \leq \epsilon$ \\
+        \hline
+        Overall Accuracy Equality & $\abs{P[Y = \hat{Y} | S = 1] - P[Y = \hat{Y} | S \neq 1]} \leq \epsilon$ \\
+        \hline
+        Mean Difference & $\abs{E[\hat{Y}|S = 1] - E[\hat{Y}|S \neq 1]} \leq \epsilon$ \\
+        \hline
+        \multirow{2}{*}{Equalized Odds} & $\abs{P[\hat{Y} = 1 | S = 1, Y = 0] - P[\hat{Y} = 1 | S \neq 1, Y = 0]} \leq \epsilon$ \\
+        \cline{2-2}
+                                        & $\abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} \leq \epsilon$ \\
+        \hline
+        Equal Opportunity & $\abs{P[\hat{Y} = 1 | S = 1, Y = 1] - P[\hat{Y} = 1 | S \neq 1, Y = 1]} \leq \epsilon$ \\
+        \hline
+        Predictive Equality & $\abs{P[\hat{Y} = 1 | S = 1, Y = 0] - P[\hat{Y} = 1 | S \neq 1, Y = 0]} \leq \epsilon$ \\
+        \hline
+        \multirow{2}{*}{Conditional Use Accuracy Equality} & $\abs{P[Y = 1 | S = 1, \hat{Y} = 1] - P[Y = 1 | S \neq 1, \hat{Y} = 1]} \leq \epsilon$ \\
+        \cline{2-2}
+                                         & $\abs{P[Y = 0 | S = 1, \hat{Y} = 0] - P[Y = 0 | S \neq 1, \hat{Y} = 0]} \leq \epsilon$ \\
+        \hline
+        Predictive Parity & $\abs{P[Y = 1 | S = 1, \hat{Y} = 1] - P[Y = 1 | S \neq 1, \hat{Y} = 1]} \leq \epsilon$ \\
+        \hline
+        Equal Calibration & $\abs{P[Y = 1 | S = 1, \hat{V} = v] - P[Y = 1 | S \neq 1, \hat{V} = v]} \leq \epsilon$ \\
+        \hline
+        Positive Balance & $\abs{E[\hat{V} | Y = 1, S = 1] - E[\hat{V} | Y = 1, S \neq 1]} \leq \epsilon$ \\
+        \hline
+        Negative Balance & $\abs{E[\hat{V} | Y = 0, S = 1] - E[\hat{V} | Y = 0, S \neq 1]} \leq \epsilon$ \\
+        \hline
+            \end{tabular}
+            }
+            \caption{Fairness measures.}
+            \label{tab:measures}
+        \end{table}
 \end{frame}
 
 \begin{frame}
@@ -295,6 +325,20 @@ Quantitative Bias in AI Systems}
 \newcommand{\calib}{C}
 
 \begin{frame}
+    \frametitle{Predicate}
+    We first introduce the idea of a predicate.
+    \begin{itemize}
+        \item A \emph{predicate} is a decider that determines
+        if some condition holds for some given input.
+        \item Formally, it is a function that takes
+        some type $\alpha$ and returns True or False.
+        \item For example, an ``$\text{adult}(x)$'' predicate might
+        take a person $x$'s data and returns if they are over 18
+        year old.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
     \frametitle{Abstraction}
     Our framework tool abstracts the fairness measures:
     \begin{itemize}
@@ -310,7 +354,7 @@ Quantitative Bias in AI Systems}
         row's prediction is positive if its score is greater than 7.
         \item A \emph{ground truth predicate} $\tru$ takes a row and gives the ground
         truth of the result. For example,
-        $\tru(r_i) := r_i(\text{``recid''})$ indicates a
+        $\tru(r_i) := r_i(\text{``recid''}) == \text{True}$ indicates a
         row's actual recidivism.
     \end{itemize}
 \end{frame}
@@ -329,17 +373,18 @@ Quantitative Bias in AI Systems}
         \item $Y = 1$ if and only if $\tru$ is true
         \item $\hat{Y} = 1$ if and only if $\pos$ is true
         \item $S = 1$ if and only if $\priv$ is true
+        \item and vice versa
     \end{itemize}
     This way, we can calculate equal opportunity as a function:
     \begin{align*}
-        \text{equal\_opportunity} (\epsilon, \model, \priv, \pos, \tru)
+        \text{equal\_opportunity} (\epsilon, \priv, \pos, \tru)
     \end{align*}
 \end{frame}
 
 \begin{frame}
     \frametitle{Application}
-    To demonstrate an application, we analyzed the COMPAS dataset.
-    We set the predicates:
+    For demonstration, we analyzed the COMPAS dataset.
+    Let's set the predicates:
     \begin{align*}
         \priv(r_i) & := r_i(\text{``race''}) \neq \text{``African-American''}\\
         \pos(r_i)  & := r_i(\text{``score\_text''}) \in \set{\text{``Medium''},\text{``High''}}\\
@@ -360,6 +405,13 @@ Quantitative Bias in AI Systems}
     \centering
     \includegraphics[width=0.73\textwidth]{Caucasian}
     \captionof{figure}{Unprivileged Group: Caucasian}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Application}
+    \centering
+    \includegraphics[width=0.73\textwidth]{Asian}
+    \captionof{figure}{Unprivileged Group: Asian (32 rows)}
 \end{frame}
 
 \begin{frame}
