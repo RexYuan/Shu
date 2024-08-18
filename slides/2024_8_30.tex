@@ -429,7 +429,7 @@ def equal_opportunity(
     \begin{minted}[fontsize=\small, frame=single, linenos]{python}
 equal_opportunity(
     0.2,
-    lambda row: row['race'] == 'African-American',
+    lambda row: row['race'] != 'African-American',
     lambda row: row['score_text']
       in {'Medium', 'High'},
     lambda row: row['is_recid'] == '1')
