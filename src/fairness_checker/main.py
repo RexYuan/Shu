@@ -33,10 +33,10 @@ class fairness_model_checker:
 
     def write_to_csv(self, filename: str, rows: Iterable[csv_row]):
         with open(filename, 'w') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=self.fieldnames[:-1])
+            writer = csv.DictWriter(csvfile, fieldnames=self.fieldnames)
             writer.writeheader()
             for row in rows:
-                writer.writerow({k: v for k, v in row.items() if k in self.fieldnames[:-1]})
+                writer.writerow({k: v for k, v in row.items() if k in self.fieldnames})
 
     def remove_csv(self, filename: str):
         os.remove(filename)
