@@ -4,7 +4,7 @@ This Python module fairness_checker provides a set of methods to evaluate the fa
 
 ## Dependencies
 
-* Python >= 3.6
+* Python >= 3.8
 
 ## Installation
 

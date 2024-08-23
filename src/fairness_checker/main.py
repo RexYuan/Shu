@@ -2,11 +2,15 @@ import os
 import csv
 import math
 
-from typing import Callable, Iterable, Dict, TypeVar, Any, Tuple
+from typing import Callable, Iterable, Dict, TypeVar, Any, Tuple, Protocol, Union, Sequence
 from contextlib import contextmanager
 
 csv_row = Dict[str, str]
 T = TypeVar('T')
+K = TypeVar('K')
+class Predictable(Protocol):
+    def predict(self, filename : str) -> Sequence[Any]:
+        ...
 
 def print_stats(title, measure, ratio):
     print(title)
@@ -25,10 +29,10 @@ class fairness_model_checker:
         Parameters:
         raw_file (str): Path to the raw data file in CSV format.
         """
-        self.verbose = verbose
+        self.verbose: bool = verbose
         with open(raw_file, 'r') as file:
             reader = csv.DictReader(file)
-            self.fieldnames = reader.fieldnames
+            self.fieldnames = list(reader.fieldnames or [])
             self.reader = list(reader)
 
     def write_to_csv(self, filename: str, rows: Iterable[csv_row]):
@@ -49,10 +53,10 @@ class fairness_model_checker:
 
     def disparate_impact(self,
                          ratio: float,
-                         model: object,
+                         model: Predictable,
                          privileged_predicate: Callable[[csv_row], bool],
                          positive_predicate: Callable[[T], bool],
-                         value: bool = False) -> bool:
+                         value: bool = False) -> Union[bool, float]:
         """
         Evaluates the disparate impact of the model's predictions between privileged and unprivileged groups.
 
@@ -88,10 +92,10 @@ class fairness_model_checker:
 
     def demographic_parity(self,
                            ratio: float,
-                           model: object,
+                           model: Predictable,
                            privileged_predicate: Callable[[csv_row], bool],
                            positive_predicate: Callable[[T], bool],
-                           value: bool = False) -> bool:
+                           value: bool = False) -> Union[bool, float]:
         """
         Evaluates the demographic parity of the model's predictions between privileged and unprivileged groups.
 
@@ -127,11 +131,11 @@ class fairness_model_checker:
 
     def equalized_odds(self,
                        ratio: float,
-                       model: object,
+                       model: Predictable,
                        privileged_predicate: Callable[[csv_row], bool],
                        positive_predicate: Callable[[T], bool],
                        truth_predicate: Callable[[csv_row], bool],
-                       value: bool = False) -> bool:
+                       value: bool = False) -> Union[bool, Tuple[float, float]]:
         """
         Evaluates the equalized odds of the model's predictions between privileged and unprivileged groups.
 
@@ -184,11 +188,11 @@ class fairness_model_checker:
 
     def equal_opportunity(self,
                           ratio: float,
-                          model: object,
+                          model: Predictable,
                           privileged_predicate: Callable[[csv_row], bool],
                           positive_predicate: Callable[[T], bool],
                           truth_predicate: Callable[[csv_row], bool],
-                          value: bool = False) -> bool:
+                          value: bool = False) -> Union[bool, float]:
         """
         Evaluates the equal opportunity of the model's predictions between privileged and unprivileged groups.
 
@@ -225,11 +229,11 @@ class fairness_model_checker:
 
     def accuracy_eqaulity(self,
                           ratio: float,
-                          model: object,
+                          model: Predictable,
                           privileged_predicate: Callable[[csv_row], bool],
-                          positive_predicate: Callable[[csv_row], bool],
+                          positive_predicate: Callable[[T], bool],
                           truth_predicate: Callable[[csv_row], bool],
-                          value: bool = False) -> bool:
+                          value: bool = False) -> Union[bool, float]:
         """
         Evaluates the accuracy eqaulity of the model's predictions between privileged and unprivileged groups.
 
@@ -271,11 +275,11 @@ class fairness_model_checker:
 
     def predictive_parity(self,
                           ratio: float,
-                          model: object,
+                          model: Predictable,
                           privileged_predicate: Callable[[csv_row], bool],
-                          positive_predicate: Callable[[csv_row], bool],
+                          positive_predicate: Callable[[T], bool],
                           truth_predicate: Callable[[csv_row], bool],
-                          value: bool = False) -> bool:
+                          value: bool = False) -> Union[bool, float]:
         """
         Evaluates the predictive parity of the model's predictions between privileged and unprivileged groups.
 
@@ -301,11 +305,11 @@ class fairness_model_checker:
         privileged_positive = list(filter(lambda row_Y: privileged_predicate(row_Y[0]) and positive_predicate(row_Y[1]), zip(self.reader, privileged_Y_pred)))
         unprivileged_positive = list(filter(lambda row_Y: not privileged_predicate(row_Y[0]) and positive_predicate(row_Y[1]), zip(self.reader, unprivileged_Y_pred)))
 
-        privileged_positive = list(map(lambda row_Y: row_Y[0], privileged_positive))
-        unprivileged_positive = list(map(lambda row_Y: row_Y[0], unprivileged_positive))
+        privileged_positive_csv_row = list(map(lambda row_Y: row_Y[0], privileged_positive))
+        unprivileged_positive_csv_row = list(map(lambda row_Y: row_Y[0], unprivileged_positive))
 
-        privileged_positive_truth = list(filter(lambda row: truth_predicate(row), privileged_positive))
-        unprivileged_positive_truth = list(filter(lambda row: truth_predicate(row), unprivileged_positive))
+        privileged_positive_truth = list(filter(lambda row: truth_predicate(row), privileged_positive_csv_row))
+        unprivileged_positive_truth = list(filter(lambda row: truth_predicate(row), unprivileged_positive_csv_row))
 
         privileged_positive_truth_percentage = len(privileged_positive_truth) / len(privileged_positive)
         unprivileged_positive_truth_percentage = len(unprivileged_positive_truth) / len(unprivileged_positive)
@@ -320,12 +324,12 @@ class fairness_model_checker:
 
     def equal_calibration(self,
                           ratio: float,
-                          model: object,
+                          model: Predictable,
                           privileged_predicate: Callable[[csv_row], bool],
                           truth_predicate: Callable[[csv_row], bool],
-                          calib_predicate_h: Callable[..., Callable[[csv_row], bool]],
+                          calib_predicate_h: Callable[..., Callable[[T], bool]],
                           calib_arg: Tuple[Any, ...],
-                          value: bool = False) -> bool:
+                          value: bool = False) -> Union[bool, float]:
         """
         Evaluates the equal calibration of the model's predictions between privileged and unprivileged groups.
 
@@ -353,11 +357,11 @@ class fairness_model_checker:
         privileged_score = list(filter(lambda row_Y: calib_predicate(row_Y[1]), zip(privileged, privileged_Y_pred)))
         unprivileged_score = list(filter(lambda row_Y: calib_predicate(row_Y[1]), zip(unprivileged, unprivileged_Y_pred)))
 
-        privileged_score = list(map(lambda row_Y: row_Y[0], privileged_score))
-        unprivileged_score = list(map(lambda row_Y: row_Y[0], unprivileged_score))
+        privileged_score_csv_row = list(map(lambda row_Y: row_Y[0], privileged_score))
+        unprivileged_score_csv_row = list(map(lambda row_Y: row_Y[0], unprivileged_score))
 
-        privileged_positive_truth = list(filter(lambda row: truth_predicate(row), privileged_score))
-        unprivileged_positive_truth = list(filter(lambda row: truth_predicate(row), unprivileged_score))
+        privileged_positive_truth = list(filter(lambda row: truth_predicate(row), privileged_score_csv_row))
+        unprivileged_positive_truth = list(filter(lambda row: truth_predicate(row), unprivileged_score_csv_row))
 
         privileged_positive_truth_percentage = len(privileged_positive_truth) / len(privileged_score)
         unprivileged_positive_truth_percentage = len(unprivileged_positive_truth) / len(unprivileged_score)
@@ -372,12 +376,12 @@ class fairness_model_checker:
 
     def conditional_statistical_parity(self,
                                        ratio: float,
-                                       model: object,
+                                       model: Predictable,
                                        privileged_predicate: Callable[[csv_row], bool],
-                                       positive_predicate: Callable[[csv_row], bool],
+                                       positive_predicate: Callable[[T], bool],
                                        legitimate_predicate_h: Callable[..., Callable[[csv_row], bool]],
                                        legitimate_arg: Tuple[Any, ...],
-                                       value: bool = False) -> bool:
+                                       value: bool = False) -> Union[bool, float]:
         """
         Evaluates the conditional statistical parity of the model's predictions between privileged and unprivileged groups.
 
@@ -420,11 +424,11 @@ class fairness_model_checker:
 
     def predictive_equality(self,
                             ratio: float,
-                            model: object,
+                            model: Predictable,
                             privileged_predicate: Callable[[csv_row], bool],
                             positive_predicate: Callable[[T], bool],
                             truth_predicate: Callable[[csv_row], bool],
-                            value: bool = False) -> bool:
+                            value: bool = False) -> Union[bool, float]:
         """
         Evaluates the predictive equality of the model's predictions between privileged and unprivileged groups.
 
@@ -461,11 +465,11 @@ class fairness_model_checker:
 
     def conditional_use_accuracy_equality(self,
                                           ratio: float,
-                                          model: object,
+                                          model: Predictable,
                                           privileged_predicate: Callable[[csv_row], bool],
-                                          positive_predicate: Callable[[csv_row], bool],
+                                          positive_predicate: Callable[[T], bool],
                                           truth_predicate: Callable[[csv_row], bool],
-                                          value: bool = False) -> bool:
+                                          value: bool = False) -> Union[bool, Tuple[float, float]]:
         """
         Evaluates the conditional use accuracy equality of the model's predictions between privileged and unprivileged groups.
 
@@ -491,11 +495,11 @@ class fairness_model_checker:
         privileged_positive = list(filter(lambda row_Y: privileged_predicate(row_Y[0]) and positive_predicate(row_Y[1]), zip(self.reader, privileged_Y_pred)))
         unprivileged_positive = list(filter(lambda row_Y: not privileged_predicate(row_Y[0]) and positive_predicate(row_Y[1]), zip(self.reader, unprivileged_Y_pred)))
 
-        privileged_positive = list(map(lambda row_Y: row_Y[0], privileged_positive))
-        unprivileged_positive = list(map(lambda row_Y: row_Y[0], unprivileged_positive))
+        privileged_positive_csv_row = list(map(lambda row_Y: row_Y[0], privileged_positive))
+        unprivileged_positive_csv_row = list(map(lambda row_Y: row_Y[0], unprivileged_positive))
 
-        privileged_positive_truth = list(filter(lambda row: truth_predicate(row), privileged_positive))
-        unprivileged_positive_truth = list(filter(lambda row: truth_predicate(row), unprivileged_positive))
+        privileged_positive_truth = list(filter(lambda row: truth_predicate(row), privileged_positive_csv_row))
+        unprivileged_positive_truth = list(filter(lambda row: truth_predicate(row), unprivileged_positive_csv_row))
 
         privileged_positive_truth_percentage = len(privileged_positive_truth) / len(privileged_positive)
         unprivileged_positive_truth_percentage = len(unprivileged_positive_truth) / len(unprivileged_positive)
@@ -507,11 +511,11 @@ class fairness_model_checker:
         privileged_negative = list(filter(lambda row_Y: privileged_predicate(row_Y[0]) and not positive_predicate(row_Y[1]), zip(self.reader, privileged_Y_pred)))
         unprivileged_negative = list(filter(lambda row_Y: not privileged_predicate(row_Y[0]) and not positive_predicate(row_Y[1]), zip(self.reader, unprivileged_Y_pred)))
 
-        privileged_negative = list(map(lambda row_Y: row_Y[0], privileged_negative))
-        unprivileged_negative = list(map(lambda row_Y: row_Y[0], unprivileged_negative))
+        privileged_negative_csv_row = list(map(lambda row_Y: row_Y[0], privileged_negative))
+        unprivileged_negative_csv_row = list(map(lambda row_Y: row_Y[0], unprivileged_negative))
 
-        privileged_negative_untruth = list(filter(lambda row: not truth_predicate(row), privileged_negative))
-        unprivileged_negative_untruth = list(filter(lambda row: not truth_predicate(row), unprivileged_negative))
+        privileged_negative_untruth = list(filter(lambda row: not truth_predicate(row), privileged_negative_csv_row))
+        unprivileged_negative_untruth = list(filter(lambda row: not truth_predicate(row), unprivileged_negative_csv_row))
 
         privileged_negative_untruth_percentage = len(privileged_negative_untruth) / len(privileged_negative)
         unprivileged_negative_untruth_percentage = len(unprivileged_negative_untruth) / len(unprivileged_negative)
@@ -526,11 +530,11 @@ class fairness_model_checker:
 
     def positive_balance(self,
                          ratio: float,
-                         model: object,
+                         model: Predictable,
                          privileged_predicate: Callable[[csv_row], bool],
-                         score_predicate: Callable[[csv_row], bool],
+                         score_predicate: Callable[[T], K],
                          truth_predicate: Callable[[csv_row], bool],
-                         value: bool = False) -> bool:
+                         value: bool = False) -> Union[bool, float]:
         """
         Evaluates the positive balance of the model's predictions between privileged and unprivileged groups.
 
@@ -556,8 +560,8 @@ class fairness_model_checker:
                 privileged_Y_pred = model.predict('privileged.csv')
                 unprivileged_Y_pred = model.predict('unprivileged.csv')
 
-        privileged_truth_score_mean = sum(map(lambda row_Y: score_predicate(row_Y[1]), zip(privileged_truth, privileged_Y_pred))) / len(privileged_truth)
-        unprivileged_truth_score_mean = sum(map(lambda row_Y: score_predicate(row_Y[1]), zip(unprivileged_truth, unprivileged_Y_pred))) / len(unprivileged_truth)
+        privileged_truth_score_mean = sum(privileged_Y_pred) / len(privileged_truth)
+        unprivileged_truth_score_mean = sum(unprivileged_Y_pred) / len(unprivileged_truth)
 
         measure = abs(privileged_truth_score_mean - unprivileged_truth_score_mean)
 
@@ -570,11 +574,11 @@ class fairness_model_checker:
 
     def negative_balance(self,
                          ratio: float,
-                         model: object,
+                         model: Predictable,
                          privileged_predicate: Callable[[csv_row], bool],
-                         score_predicate: Callable[[csv_row], bool],
+                         score_predicate: Callable[[T], K],
                          truth_predicate: Callable[[csv_row], bool],
-                         value: bool = False) -> bool:
+                         value: bool = False) -> Union[bool, float]:
         """
         Evaluates the negative balance of the model's predictions between privileged and unprivileged groups.
 
@@ -600,8 +604,8 @@ class fairness_model_checker:
                 privileged_Y_pred = model.predict('privileged.csv')
                 unprivileged_Y_pred = model.predict('unprivileged.csv')
 
-        privileged_untruth_score_mean = sum(map(lambda row_Y: score_predicate(row_Y[1]), zip(privileged_untruth, privileged_Y_pred))) / len(privileged_untruth)
-        unprivileged_untruth_score_mean = sum(map(lambda row_Y: score_predicate(row_Y[1]), zip(unprivileged_untruth, unprivileged_Y_pred))) / len(unprivileged_untruth)
+        privileged_untruth_score_mean = sum(privileged_Y_pred) / len(privileged_untruth)
+        unprivileged_untruth_score_mean = sum(unprivileged_Y_pred) / len(unprivileged_untruth)
 
         measure = abs(privileged_untruth_score_mean - unprivileged_untruth_score_mean)
 
@@ -614,10 +618,10 @@ class fairness_model_checker:
 
     def mean_difference(self,
                         ratio: float,
-                        model: object,
+                        model: Predictable,
                         privileged_predicate: Callable[[csv_row], bool],
-                        positive_predicate: Callable[[csv_row], bool],
-                        value: bool = False) -> bool:
+                        positive_predicate: Callable[[T], bool],
+                        value: bool = False) -> Union[bool, float]:
         """
         Evaluates the mean difference of the model's predictions between privileged and unprivileged groups.
 
@@ -641,9 +645,6 @@ class fairness_model_checker:
 
         privileged_positive = list(filter(lambda row_Y: privileged_predicate(row_Y[0]) and positive_predicate(row_Y[1]), zip(self.reader, privileged_Y_pred)))
         unprivileged_positive = list(filter(lambda row_Y: not privileged_predicate(row_Y[0]) and positive_predicate(row_Y[1]), zip(self.reader, unprivileged_Y_pred)))
-
-        privileged_positive = list(map(lambda row_Y: row_Y[0], privileged_positive))
-        unprivileged_positive = list(map(lambda row_Y: row_Y[0], unprivileged_positive))
 
         privileged_positive_percentage = len(privileged_positive) / len(privileged)
         unprivileged_positive_percentage = len(unprivileged_positive) / len(unprivileged)
@@ -675,7 +676,7 @@ class fairness_csv_checker:
                          ratio: float,
                          privileged_predicate: Callable[[csv_row], bool],
                          positive_predicate: Callable[[csv_row], bool],
-                         value: bool = False) -> bool:
+                         value: bool = False) -> Union[bool, float]:
         """
         Evaluates the disparate impact of the model's predictions between privileged and unprivileged groups.
 
@@ -709,7 +710,7 @@ class fairness_csv_checker:
                            ratio: float,
                            privileged_predicate: Callable[[csv_row], bool],
                            positive_predicate: Callable[[csv_row], bool],
-                           value: bool = False) -> bool:
+                           value: bool = False) -> Union[bool, float]:
         """
         Evaluates the demographic parity of the model's predictions between privileged and unprivileged groups.
 
@@ -744,7 +745,7 @@ class fairness_csv_checker:
                        privileged_predicate: Callable[[csv_row], bool],
                        positive_predicate: Callable[[csv_row], bool],
                        truth_predicate: Callable[[csv_row], bool],
-                       value: bool = False) -> bool:
+                       value: bool = False) -> Union[bool, Tuple[float, float]]:
         """
         Evaluates the equalized odds of the model's predictions between privileged and unprivileged groups.
 
@@ -794,7 +795,7 @@ class fairness_csv_checker:
                           privileged_predicate: Callable[[csv_row], bool],
                           positive_predicate: Callable[[csv_row], bool],
                           truth_predicate: Callable[[csv_row], bool],
-                          value: bool = False) -> bool:
+                          value: bool = False) -> Union[bool, float]:
         """
         Evaluates the equal opportunity of the model's predictions between privileged and unprivileged groups.
 
@@ -830,7 +831,7 @@ class fairness_csv_checker:
                           privileged_predicate: Callable[[csv_row], bool],
                           positive_predicate: Callable[[csv_row], bool],
                           truth_predicate: Callable[[csv_row], bool],
-                          value: bool = False) -> bool:
+                          value: bool = False) -> Union[bool, float]:
         """
         Evaluates the accuracy eqaulity of the model's predictions between privileged and unprivileged groups.
 
@@ -868,7 +869,7 @@ class fairness_csv_checker:
                           privileged_predicate: Callable[[csv_row], bool],
                           positive_predicate: Callable[[csv_row], bool],
                           truth_predicate: Callable[[csv_row], bool],
-                          value: bool = False) -> bool:
+                          value: bool = False) -> Union[bool, float]:
         """
         Evaluates the predictive parity of the model's predictions between privileged and unprivileged groups.
 
@@ -904,7 +905,7 @@ class fairness_csv_checker:
                           truth_predicate: Callable[[csv_row], bool],
                           calib_predicate_h: Callable[..., Callable[[csv_row], bool]],
                           calib_arg: Tuple[Any, ...],
-                          value: bool = False) -> bool:
+                          value: bool = False) -> Union[bool, float]:
         """
         Evaluates the equal calibration of the model's predictions between privileged and unprivileged groups.
 
@@ -942,7 +943,7 @@ class fairness_csv_checker:
                                        positive_predicate: Callable[[csv_row], bool],
                                        legitimate_predicate_h: Callable[..., Callable[[csv_row], bool]],
                                        legitimate_arg: Tuple[Any, ...],
-                                       value: bool = False) -> bool:
+                                       value: bool = False) -> Union[bool, float]:
         """
         Evaluates the conditional statistical parity of the model's predictions between privileged and unprivileged groups.
 
@@ -978,7 +979,7 @@ class fairness_csv_checker:
                             privileged_predicate: Callable[[csv_row], bool],
                             positive_predicate: Callable[[csv_row], bool],
                             truth_predicate: Callable[[csv_row], bool],
-                            value: bool = False) -> bool:
+                            value: bool = False) -> Union[bool, float]:
         """
         Evaluates the predictive equality of the model's predictions between privileged and unprivileged groups.
 
@@ -1014,7 +1015,7 @@ class fairness_csv_checker:
                                           privileged_predicate: Callable[[csv_row], bool],
                                           positive_predicate: Callable[[csv_row], bool],
                                           truth_predicate: Callable[[csv_row], bool],
-                                          value: bool = False) -> bool:
+                                          value: bool = False) -> Union[bool, Tuple[float, float]]:
         """
         Evaluates the conditional use accuracy equality of the model's predictions between privileged and unprivileged groups.
 
@@ -1062,7 +1063,7 @@ class fairness_csv_checker:
                          privileged_predicate: Callable[[csv_row], bool],
                          score_predicate: Callable[[csv_row], bool],
                          truth_predicate: Callable[[csv_row], bool],
-                         value: bool = False) -> bool:
+                         value: bool = False) -> Union[bool, float]:
         """
         Evaluates the positive balance of the model's predictions between privileged and unprivileged groups.
 
@@ -1095,7 +1096,7 @@ class fairness_csv_checker:
                          privileged_predicate: Callable[[csv_row], bool],
                          score_predicate: Callable[[csv_row], bool],
                          truth_predicate: Callable[[csv_row], bool],
-                         value: bool = False) -> bool:
+                         value: bool = False) -> Union[bool, float]:
         """
         Evaluates the negative balance of the model's predictions between privileged and unprivileged groups.
 
@@ -1127,7 +1128,7 @@ class fairness_csv_checker:
                         ratio: float,
                         privileged_predicate: Callable[[csv_row], bool],
                         positive_predicate: Callable[[csv_row], bool],
-                        value: bool = False) -> bool:
+                        value: bool = False) -> Union[bool, float]:
         """
         Evaluates the mean difference of the model's predictions between privileged and unprivileged groups.
 

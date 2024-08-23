@@ -113,16 +113,24 @@ trained_tree = compas_model_wrapper(tree_model)
 
 c = fairness_model_checker('compas_score.csv')
 race = 'African-American'
-c.disparate_impact(0.8, trained, lambda row: row['race'] != race, lambda Y: Y == 1)
-c.demographic_parity(0.2, trained, lambda row: row['race'] != race, lambda Y: Y == 1)
-c.equalized_odds(0.2, trained, lambda row: row['race'] != race, lambda Y: Y == 1, lambda row: row['two_year_recid'] == '1')
-c.equal_opportunity(0.2, trained, lambda row: row['race'] != race, lambda Y: Y == 1, lambda row: row['two_year_recid'] == '1')
-c.accuracy_eqaulity(0.2, trained, lambda row: row['race'] != race, lambda Y: Y == 1, lambda row: row['is_recid'] == '1')
-c.predictive_parity(0.2, trained, lambda row: row['race'] != race, lambda Y: Y == 1, lambda row: row['is_recid'] == '1')
-c.equal_calibration(0.2, trained_tree, lambda row: row['race'] != race, lambda row: row['is_recid'] == '1', lambda u,l: (lambda Y: l <= int(Y) and int(Y) <= u), (7, 5))
-c.conditional_statistical_parity(0.2, trained, lambda row: row['race'] != race, lambda Y: Y == 1, lambda x: (lambda row: int(row['priors_count']) > x), (0,))
-c.predictive_equality(0.2, trained, lambda row: row['race'] != race, lambda Y: Y == 1, lambda row: row['is_recid'] == '1')
-c.conditional_use_accuracy_equality(0.2, trained, lambda row: row['race'] != race, lambda Y: Y == 1, lambda row: row['is_recid'] == '1')
-c.positive_balance(5, trained_tree, lambda row: row['race'] != race, lambda Y: int(Y), lambda row: row['is_recid'] == '1')
-c.negative_balance(5, trained_tree, lambda row: row['race'] != race, lambda Y: int(Y), lambda row: row['is_recid'] == '1')
-c.mean_difference(0.2, trained, lambda row: row['race'] != race, lambda Y: Y == 1)
+def pos_pred(Y: int) -> bool:
+    return Y == 1
+def calib_pred(u: int, l: int):
+    def pred(Y: int) -> bool:
+        return l <= int(Y) and int(Y) <= u
+    return pred
+def sco_pred(Y: int) -> int:
+    return int(Y)
+c.disparate_impact(0.8, trained, lambda row: row['race'] != race, pos_pred)
+c.demographic_parity(0.2, trained, lambda row: row['race'] != race, pos_pred)
+c.equalized_odds(0.2, trained, lambda row: row['race'] != race, pos_pred, lambda row: row['two_year_recid'] == '1')
+c.equal_opportunity(0.2, trained, lambda row: row['race'] != race, pos_pred, lambda row: row['two_year_recid'] == '1')
+c.accuracy_eqaulity(0.2, trained, lambda row: row['race'] != race, pos_pred, lambda row: row['is_recid'] == '1')
+c.predictive_parity(0.2, trained, lambda row: row['race'] != race, pos_pred, lambda row: row['is_recid'] == '1')
+c.equal_calibration(0.2, trained_tree, lambda row: row['race'] != race, lambda row: row['is_recid'] == '1', calib_pred, (7, 5))
+c.conditional_statistical_parity(0.2, trained, lambda row: row['race'] != race, pos_pred, lambda x: (lambda row: int(row['priors_count']) > x), (0,))
+c.predictive_equality(0.2, trained, lambda row: row['race'] != race, pos_pred, lambda row: row['is_recid'] == '1')
+c.conditional_use_accuracy_equality(0.2, trained, lambda row: row['race'] != race, pos_pred, lambda row: row['is_recid'] == '1')
+c.positive_balance(5, trained_tree, lambda row: row['race'] != race, sco_pred, lambda row: row['is_recid'] == '1')
+c.negative_balance(5, trained_tree, lambda row: row['race'] != race, sco_pred, lambda row: row['is_recid'] == '1')
+c.mean_difference(0.2, trained, lambda row: row['race'] != race, pos_pred)
