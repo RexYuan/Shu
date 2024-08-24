@@ -1,0 +1,8 @@
+name: fairness-test
+dependencies:
+  - python=3.8
+  - pip
+  - pandas
+  - scikit-learn
+  - pip:
+      - fairness-checker
