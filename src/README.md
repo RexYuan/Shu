@@ -16,6 +16,8 @@ pip3 install fairness-checker
 
 ### As a library
 
+#### CSV checker
+
 First set up the checker using a benchmark dataset:
 
 ```python3
@@ -85,6 +87,23 @@ lambda x: (lambda row: int(row['priors_count']) > x)
 ```
 
 and the argument to it, `legitimate_arg`, is `(0,)`.
+
+#### Model checker
+
+```python3
+from fairness_checker import fairness_model_checker
+c = fairness_model_checker("compas-scores-two-years.csv")
+```
+
+Alternatively, you can use the checker on a model. It expects the model
+to have a `predict` method that takes a csv filename as input and
+returns an iterable of results.
+
+```python
+c.demographic_parity(0.2, model, lambda row: row['sex'] == 'Male', lambda Y: Y == 1)
+```
+
+The last predicate here is used on the model result.
 
 ### As a command line CLI
 
