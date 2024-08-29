@@ -331,12 +331,34 @@ Quantitative Bias in AI Systems}
     \begin{itemize}
         \item A \emph{predicate} is a decider that determines
         if some condition holds for some given input.
-        \item Formally, it is a function that takes
-        some type $\alpha$ and returns True or False.
         \item For example, an ``$\text{adult}(x)$'' predicate might
         take a person $x$'s data and returns if they are over 18
         year old.
     \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Predicate}
+    \[
+    \begin{array}{rcl}
+    \text{adult}(r_i) & := & r_i(\text{``Age''}) > 18 \\
+    \text{rich}(r_i) & := & r_i(\text{``Income''}) > 3000
+    \end{array}
+    \]
+    \begin{table}
+        \begin{tabular}{|c|c|c|c|c|}
+            \hline
+                  & Age & Income & $\text{adult}(r_i)$ & $\text{rich}(x)$ \\
+            \hline
+            $r_1$ & 14 & \$10000 & False & True  \\
+            $r_2$ & 17 & \$1000 & False & False  \\
+            $r_3$ & 45 & \$1500 & True & False  \\
+            $r_4$ & 40 & \$2000 & True & False  \\
+            $r_5$ & 32 & \$5000 & True & True  \\
+            \hline
+        \end{tabular}
+        \caption{Example Dataset with Predicates}
+    \end{table}
 \end{frame}
 
 \begin{frame}
@@ -351,7 +373,7 @@ Quantitative Bias in AI Systems}
         means the privileged group is those with race being Caucasian.
         \item A \emph{positive predicate} $\pos$ takes a row and determines if its
         prediction is positive. For example,
-        $\pos(r_i) := \mathtt{int}(r_i(\text{``score''})) > 7$ means a
+        $\pos(r_i) := r_i(\text{``score''}) > 7$ means a
         row's prediction is positive if its score is greater than 7.
         \item A \emph{ground truth predicate} $\tru$ takes a row and gives the ground
         truth of the result. For example,
