@@ -5,7 +5,7 @@ with open("src/README.md", "r") as f:
 
 setup(
     name="fairness_checker",
-    version="0.1.12",
+    version="0.1.13",
     package_dir={'': 'src'},
     packages=find_packages(where="src"),
     description="Fairnes checker",
