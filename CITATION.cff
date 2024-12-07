@@ -8,6 +8,6 @@ authors:
   given-names: "Bow-Yaw"
   affiliation: "Institute of Information Science, Academia Sinica, Taipei, Taiwan"
 title: "Fairness Checker"
-version: 0.1.12
+version: 0.1.13
 date-released: 2024-08-24
 url: "https://github.com/RexYuan/Shu/"
